@@ -9,14 +9,24 @@ import {
   Platform,
   StyleSheet,
   Text,
+  TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 
 const Login = () => {
   const { type } = useLocalSearchParams<{ type: string }>();
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  console.log(type);
+  const onLogInPress = () => {
+    //
+  };
+
+  const onSignInPress = () => {
+    //
+  };
 
   return (
     <KeyboardAvoidingView
@@ -38,6 +48,40 @@ const Login = () => {
       <Text style={styles.title}>
         {type === 'login' ? 'Welcome back' : 'Create your account'}
       </Text>
+
+      <View style={{ marginBottom: 30 }}>
+        <TextInput
+          style={styles.inputField}
+          placeholder='Email'
+          autoCapitalize='none'
+          value={email}
+          onChangeText={setEmail}
+        />
+        <TextInput
+          style={styles.inputField}
+          placeholder='Password'
+          autoCapitalize='none'
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+      </View>
+
+      {type === 'login' ? (
+        <TouchableOpacity
+          onPress={onLogInPress}
+          style={[defaultStyles.btn, styles.btnPrimary]}
+        >
+          <Text style={styles.btnPrimaryText}>Login</Text>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          onPress={onSignInPress}
+          style={[defaultStyles.btn, styles.btnPrimary]}
+        >
+          <Text style={styles.btnPrimaryText}>Create Account</Text>
+        </TouchableOpacity>
+      )}
     </KeyboardAvoidingView>
   );
 };
