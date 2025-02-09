@@ -10,7 +10,7 @@ const index = () => {
     <View>
       <StatusBar style='dark' />
 
-      <Text>page</Text>
+      <Text>inside chat (chat)</Text>
       <Button title='Sign out' onPress={() => signOut()} />
     </View>
   );
