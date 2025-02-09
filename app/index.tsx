@@ -7,7 +7,7 @@ import BottomLoginSheet from '@/components/BottomLoginSheet';
 const index = () => {
   return (
     <View style={styles.container}>
-      <StatusBar style='auto' />
+      <StatusBar style='dark' />
       {/* <AnimatedIntro /> */}
       <BottomLoginSheet />
     </View>

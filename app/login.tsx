@@ -1,9 +1,12 @@
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
+import { useSignIn, useSignUp } from '@clerk/clerk-expo';
 import { useLocalSearchParams } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -17,15 +20,53 @@ import {
 const Login = () => {
   const { type } = useLocalSearchParams<{ type: string }>();
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('');
+  const [emailAddress, setEmailAddress] = useState('hsn@dev.com');
   const [password, setPassword] = useState('');
 
-  const onLogInPress = () => {
+  const { signIn, isLoaded, setActive } = useSignIn();
+  const {
+    signUp,
+    isLoaded: signUpLoaded,
+    setActive: signUpSetActive,
+  } = useSignUp();
+
+  const onSignUpPress = async () => {
     //
+    if (!signUpLoaded) return;
+    setLoading(true);
+
+    try {
+      const result = await signUp.create({
+        emailAddress: emailAddress,
+        password,
+      });
+
+      signUpSetActive({
+        session: result.createdSessionId,
+      });
+    } catch (error: any) {
+      Alert.alert(error.errors[0].message);
+      setLoading(false);
+    }
   };
 
-  const onSignInPress = () => {
+  const onSignInPress = async () => {
     //
+    if (!isLoaded) return;
+    setLoading(true);
+
+    try {
+      const result = await signIn.create({
+        identifier: emailAddress,
+        password,
+      });
+      setActive({
+        session: result.createdSessionId,
+      });
+    } catch (error: any) {
+      Alert.alert(error.errors[0].message);
+      setLoading(false);
+    }
   };
 
   return (
@@ -34,6 +75,8 @@ const Login = () => {
       keyboardVerticalOffset={1}
       style={styles.container}
     >
+      <StatusBar style='dark' />
+
       {loading && (
         <View style={defaultStyles.loadingOverlay}>
           <ActivityIndicator size='large' color='#fff' />
@@ -54,8 +97,8 @@ const Login = () => {
           style={styles.inputField}
           placeholder='Email'
           autoCapitalize='none'
-          value={email}
-          onChangeText={setEmail}
+          value={emailAddress}
+          onChangeText={setEmailAddress}
         />
         <TextInput
           style={styles.inputField}
@@ -69,14 +112,14 @@ const Login = () => {
 
       {type === 'login' ? (
         <TouchableOpacity
-          onPress={onLogInPress}
+          onPress={onSignInPress}
           style={[defaultStyles.btn, styles.btnPrimary]}
         >
           <Text style={styles.btnPrimaryText}>Login</Text>
         </TouchableOpacity>
       ) : (
         <TouchableOpacity
-          onPress={onSignInPress}
+          onPress={onSignUpPress}
           style={[defaultStyles.btn, styles.btnPrimary]}
         >
           <Text style={styles.btnPrimaryText}>Create Account</Text>

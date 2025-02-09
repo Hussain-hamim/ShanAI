@@ -8,7 +8,7 @@ import {
   useRouter,
   useSegments,
 } from 'expo-router';
-import { TouchableOpacity } from 'react-native';
+import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -60,18 +60,23 @@ const InitialLayout = () => {
     const inAuthGroup = segments[0] === '(auth)';
     console.log(inAuthGroup);
 
+    // if (true) {
     if (isSignedIn && !inAuthGroup) {
       //bring the user inside
-      router.replace('/(auth)/index');
+      router.replace('/(auth)/');
     } else if (!isSignedIn && inAuthGroup) {
       // kick the user out
       router.replace('/');
     }
   }, [isSignedIn]);
 
-  if (!loaded || isLoaded) {
-    return <Slot />;
-  }
+  // if (!loaded || !isLoaded) {
+  //   return (
+  //     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+  //       <ActivityIndicator size='large' color='#000' />
+  //     </View>
+  //   );
+  // }
 
   return (
     <Stack>
@@ -88,6 +93,7 @@ const InitialLayout = () => {
           ),
         }}
       />
+      <Stack.Screen name='(auth)' options={{ headerShown: false }} />
     </Stack>
   );
 };
