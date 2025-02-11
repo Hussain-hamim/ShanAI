@@ -8,7 +8,7 @@ const index = () => {
   return (
     <View style={styles.container}>
       <StatusBar style='dark' />
-      {/* <AnimatedIntro /> */}
+      <AnimatedIntro />
       <BottomLoginSheet />
     </View>
   );

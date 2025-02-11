@@ -1,10 +1,13 @@
-import { View, Text } from 'react-native';
+import { View, Text, Button } from 'react-native';
 import React from 'react';
 import { Stack } from 'expo-router';
 import { defaultStyles } from '@/constants/Styles';
 import HeaderDropDown from '@/components/HeaderDropDown';
+import { useAuth } from '@clerk/clerk-expo';
 
 const Dalle = () => {
+  const { signOut } = useAuth();
+
   return (
     <View style={defaultStyles.pageContainer}>
       <Stack.Screen
@@ -28,6 +31,7 @@ const Dalle = () => {
       />
 
       <Text>Dalle</Text>
+      <Button onPress={() => signOut()} title='Sign out' />
     </View>
   );
 };
