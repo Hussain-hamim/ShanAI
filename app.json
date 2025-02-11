@@ -4,7 +4,7 @@
     "slug": "chatgpt",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo-white.png",
+    "icon": "./assets/images/download.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -13,7 +13,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo-white.png",
+        "foregroundImage": "./assets/images/download.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.hussainhamim.chatgpt"
@@ -28,14 +28,15 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/logo-white.png",
+          "image": "./assets/images/download.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
       ],
       "expo-secure-store",
-      "expo-build-properties"
+      "expo-build-properties",
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true
