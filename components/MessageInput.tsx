@@ -1,5 +1,10 @@
 import Colors from '@/constants/Colors';
-import { FontAwesome6, Ionicons } from '@expo/vector-icons';
+import {
+  FontAwesome6,
+  Ionicons,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from '@expo/vector-icons';
 import { View, StyleSheet } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import Animated, {
@@ -131,7 +136,12 @@ const MessageInput = ({ onShouldSendMessage }: MessageInputProps) => {
         ) : (
           <TouchableOpacity>
             {/* <Ionicons name='mic' size={30} color={Colors.grey} /> */}
-            <FontAwesome6 name='microphone' size={30} color={Colors.grey} />
+            {/* <FontAwesome6 name='microphone' size={30} color={Colors.grey} /> */}
+            <MaterialCommunityIcons
+              name='chat-plus'
+              size={30}
+              color={Colors.grey}
+            />
           </TouchableOpacity>
         )}
       </View>
