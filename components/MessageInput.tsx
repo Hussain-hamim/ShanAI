@@ -99,7 +99,7 @@ const MessageInput = ({ onShouldSendMessage }: MessageInputProps) => {
         paddingTop: 10,
         borderTopRightRadius: 30,
         borderTopLeftRadius: 30,
-        backgroundColor: 'blue',
+        backgroundColor: Colors.grey,
         borderTopColor: 'gray',
         borderTopWidth: 0.7,
       }}
@@ -109,7 +109,7 @@ const MessageInput = ({ onShouldSendMessage }: MessageInputProps) => {
           onPress={expandItems}
           style={[styles.roundBtn, expandedButtonStyle]}
         >
-          <Ionicons name='add' size={24} color={Colors.grey} />
+          <Ionicons name='add' size={30} color={Colors.grey} />
         </ATouchableOpacity>
 
         <Animated.View style={[styles.buttonView, buttonViewStyle]}>

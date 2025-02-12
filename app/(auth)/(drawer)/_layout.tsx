@@ -16,15 +16,18 @@ import { FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { DrawerActions, NavigationContainer } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
+  DrawerContentComponentProps,
   DrawerContentScrollView,
   DrawerItemList,
 } from '@react-navigation/drawer';
 
-export const CustomDrawerContent = (props: any) => {
+// a customized drawer component
+export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
   const { top, bottom } = useSafeAreaInsets();
 
   return (
     <View style={{ flex: 1, marginTop: top + 16 }}>
+      {/* HEADER */}
       <View style={{ backgroundColor: 'white', paddingBottom: 16 }}>
         <View style={styles.searchSection}>
           <Ionicons
@@ -41,13 +44,85 @@ export const CustomDrawerContent = (props: any) => {
         </View>
       </View>
 
+      {/* MIDDLE */}
       <DrawerContentScrollView
         {...props}
         contentContainerStyle={{ paddingTop: 0 }}
       >
+        {/* we spread the items from the existing drawer component vis props */}
         <DrawerItemList {...props} />
+        <View style={{ gap: 10 }}>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+          <Text>Here come some content</Text>
+        </View>
       </DrawerContentScrollView>
 
+      {/* FOOTER */}
       <View style={{ padding: 16, paddingBottom: bottom + 10 }}>
         <Link href='/(auth)/(modal)/settings' asChild>
           <TouchableOpacity style={styles.footer}>
@@ -57,6 +132,7 @@ export const CustomDrawerContent = (props: any) => {
               style={styles.avatar}
             />
             <Text style={styles.userName}>Meerakat</Text>
+            <Text style={{ color: Colors.greyLight }}>v1.0.0 - 2025</Text>
             <Ionicons
               name='ellipsis-horizontal'
               size={24}
@@ -88,7 +164,7 @@ const Layout = () => {
         headerStyle: { backgroundColor: Colors.light },
         headerShadowVisible: false,
         drawerActiveBackgroundColor: Colors.selected,
-        drawerActiveTintColor: '#000',
+        // drawerActiveTintColor: '#000',
         drawerInactiveTintColor: '#000',
         drawerItemStyle: { borderRadius: 12 },
         drawerLabelStyle: { borderRadius: -20 },
@@ -109,14 +185,13 @@ const Layout = () => {
               />
             </View>
           ),
-
           //
           headerRight: () => (
             <Link href={'/(auth)/(drawer)/(chat)/new'} push asChild>
               <TouchableOpacity>
                 <Ionicons
                   name='create-outline'
-                  size={24}
+                  size={26}
                   color={Colors.grey}
                   style={{ marginRight: 16 }}
                 />
@@ -125,7 +200,6 @@ const Layout = () => {
           ),
         }}
       />
-      //
       <Drawer.Screen
         name='dalle'
         options={{

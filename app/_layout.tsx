@@ -56,19 +56,20 @@ const InitialLayout = () => {
   }, [loaded]);
 
   useEffect(() => {
-    if (!isLoaded) return;
+    // if (!isLoaded) return;
 
     const inAuthGroup = segments[0] === '(auth)';
 
-    // if (1 === 1) {
-    if (isSignedIn && !inAuthGroup) {
+    if (1 === 1) {
+      // if (isSignedIn && !inAuthGroup) {
       //bring the user inside
       router.replace('/(auth)/(drawer)/(chat)/new');
     } else if (!isSignedIn && inAuthGroup) {
       // kick the user out
-      router.replace('/');
+      // router.replace('/');
     }
-  }, [isSignedIn]);
+    // }, [isSignedIn]);
+  }, []);
 
   // if (!loaded || !isLoaded) {
   //   return (
@@ -80,7 +81,8 @@ const InitialLayout = () => {
 
   return (
     <Stack>
-      <Stack.Screen name='index' options={{ headerShown: false }} />
+      <Stack.Screen name='(auth)' options={{ headerShown: false }} />
+      {/* <Stack.Screen name='index' options={{ headerShown: false }} /> */}
       <Stack.Screen
         name='login'
         options={{
@@ -93,7 +95,6 @@ const InitialLayout = () => {
           ),
         }}
       />
-      <Stack.Screen name='(auth)' options={{ headerShown: false }} />
     </Stack>
   );
 };

@@ -58,7 +58,9 @@ const ChatMessage = ({
         />
       )}
 
-      {loading ? (
+      <Text style={styles.text}>{content}</Text>
+
+      {/* {loading ? (
         <View style={styles.loading}>
           <ActivityIndicator color={Colors.primary} size='small' />
         </View>
@@ -81,6 +83,7 @@ const ChatMessage = ({
                   </Pressable>
                 </Link>
               </ContextMenu.Trigger>
+
               <ContextMenu.Content>
                 {contextItems.map((item, index) => (
                   <ContextMenu.Item key={item.title} onSelect={item.action}>
@@ -99,7 +102,7 @@ const ChatMessage = ({
             <Text style={styles.text}>{content}</Text>
           )}
         </>
-      )}
+      )} */}
     </View>
   );
 };
