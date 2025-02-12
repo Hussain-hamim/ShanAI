@@ -10,15 +10,16 @@ const BottomLoginSheet = () => {
   return (
     <View style={[styles.container, { paddingBottom: bottom + 40 }]}>
       <TouchableOpacity style={[defaultStyles.btn, styles.btnLight]}>
-        <Ionicons name='logo-apple' size={14} style={styles.btnIcon} />
+        <Ionicons name='logo-apple' size={18} style={styles.btnIcon} />
         <Text style={styles.btnLightText}>Continue with Apple</Text>
       </TouchableOpacity>
+
       <TouchableOpacity style={[defaultStyles.btn, styles.btnDark]}>
         <Ionicons
           name='logo-google'
-          size={16}
+          size={20}
           style={styles.btnIcon}
-          color={'#fff'}
+          color={'tomato'}
         />
         <Text style={styles.btnDarkText}>Continue with Google</Text>
       </TouchableOpacity>

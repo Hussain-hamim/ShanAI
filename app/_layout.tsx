@@ -45,7 +45,7 @@ const InitialLayout = () => {
   const router = useRouter();
 
   const { isLoaded, isSignedIn } = useAuth();
-  const segments = useSegments();
+  const segments = useSegments(); //Returns a list of selected file segments for the currently selected route.
 
   useEffect(() => {
     if (error) throw error;
@@ -57,8 +57,8 @@ const InitialLayout = () => {
 
   useEffect(() => {
     if (!isLoaded) return;
+
     const inAuthGroup = segments[0] === '(auth)';
-    console.log(inAuthGroup);
 
     // if (1 === 1) {
     if (isSignedIn && !inAuthGroup) {

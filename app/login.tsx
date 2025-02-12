@@ -31,7 +31,6 @@ const Login = () => {
   } = useSignUp();
 
   const onSignUpPress = async () => {
-    //
     if (!signUpLoaded) return;
     setLoading(true);
 
