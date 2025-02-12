@@ -11,25 +11,23 @@ const Dalle = () => {
   return (
     <View style={defaultStyles.pageContainer}>
       <Stack.Screen
-        options={
-          {
-            // headerTitle: () => (
-            // <HeaderDropDown
-            //   title='Dall-E'
-            //   onSelect={(key) => {}}
-            //   items={[
-            //     {
-            //       key: 'share',
-            //       title: 'Share GPT',
-            //       icon: 'square.and.arrow.up',
-            //     },
-            //     { key: 'details', title: 'See Details', icon: 'info.up' },
-            //     { key: 'Keep', title: 'Keep in Sidebar', icon: 'pin' },
-            //   ]}
-            // />
-            // ),
-          }
-        }
+        options={{
+          headerTitle: () => (
+            <HeaderDropDown
+              title='Dall-E'
+              onSelect={(key) => {}}
+              items={[
+                {
+                  key: 'share',
+                  title: 'Share GPT',
+                  icon: 'square.and.arrow.up',
+                },
+                { key: 'details', title: 'See Details', icon: 'info.up' },
+                { key: 'Keep', title: 'Keep in Sidebar', icon: 'pin' },
+              ]}
+            />
+          ),
+        }}
       />
 
       <Text>Dall-E</Text>

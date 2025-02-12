@@ -71,23 +71,21 @@ const Page = () => {
   return (
     <View style={defaultStyles.pageContainer}>
       <Stack.Screen
-        options={
-          {
-            // headerTitle: () => (
-            // <HeaderDropDown
-            //   title='ChatGPT'
-            //   onSelect={(key) => {
-            //     setGptVersion(key);
-            //   }}
-            //   selected={gptVersion}
-            //   items={[
-            //     { key: '3.5', title: 'GPT-3.5', icon: 'bolt' },
-            //     { key: '4', title: 'GPT-4', icon: 'sparkles' },
-            //   ]}
-            // />
-            // ),
-          }
-        }
+        options={{
+          headerTitle: () => (
+            <HeaderDropDown
+              title='ChatGPT'
+              onSelect={(key) => {
+                setGptVersion(key);
+              }}
+              selected={gptVersion}
+              items={[
+                { key: '3.5', title: 'GPT-3.5', icon: 'bolt' },
+                { key: '4', title: 'GPT-4', icon: 'sparkles' },
+              ]}
+            />
+          ),
+        }}
       />
 
       <StatusBar style='dark' />
