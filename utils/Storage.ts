@@ -5,10 +5,10 @@ export const storage = new MMKV({
   id: 'com.hussain.storage',
 });
 
-// export const keyStorage = new MMKV({
-//   id: 'openaikey',
-// });
+export const keyStorage = new MMKV({
+  id: 'openaikey',
+});
 
-// export const chatStorage = new MMKV({
-//   id: 'chats',
-// });
+export const chatStorage = new MMKV({
+  id: 'chats',
+});

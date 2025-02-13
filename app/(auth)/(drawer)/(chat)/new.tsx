@@ -13,7 +13,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import { StatusBar } from 'expo-status-bar';
 import { defaultStyles } from '@/constants/Styles';
-import { Stack } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
 import HeaderDropDown from '@/components/HeaderDropDown';
 import MessageInput from '@/components/MessageInput';
 import MessageIdeas from '@/components/MessageIdeas';
@@ -36,17 +36,17 @@ const DUMMY_MESSAGES: Message[] = [
       'i pleasei need you with my react native app coding can you help em pleasei need you with my react native app coding can you help em pleasei need you with my react native app coding can you help em please',
     role: Role.User,
   },
-  { content: 'Hello, how can i help you today!', role: Role.Bot },
-  {
-    content:
-      'i need you w em please!i need you with my react native app coding can you help em pleasei need you with my react native app coding can you help em pleasei need you with my react native app coding can you help em pleasei need you with my react native app coding can you help em please',
-    role: Role.User,
-  },
-  { content: 'Hello, how can i help you today!', role: Role.Bot },
-  {
-    content: 'i ct native app coding can you help em please',
-    role: Role.User,
-  },
+  // { content: 'Hello, how can i help you today!', role: Role.Bot },
+  // {
+  //   content:
+  //     'i need you w em please!i need you with my react native app coding can you help em pleasei need you with my react native app coding can you help em pleasei need you with my react native app coding can you help em pleasei need you with my react native app coding can you help em please',
+  //   role: Role.User,
+  // },
+  // { content: 'Hello, how can i help you today!', role: Role.Bot },
+  // {
+  //   content: 'i ct native app coding can you help em please',
+  //   role: Role.User,
+  // },
 ];
 
 const Page = () => {
@@ -58,14 +58,18 @@ const Page = () => {
   const [organization, setOrganization] = useMMKVString('org', storage);
   const [gptVersion, setGptVersion] = useMMKVString('gptVersion', storage);
 
+  if (!key || key === '' || !organization || organization === '') {
+    return <Redirect href={'/(auth)/(modal)/settings'} />;
+  }
+
+  const getCompletion = (message: string) => {
+    console.log('getting completion for: ', message);
+  };
+
   const onLayout = (event: any) => {
     // invoke on layout changes
     const { height } = event.nativeEvent.layout;
     setHeight(height);
-  };
-
-  const getCompletion = (message: string) => {
-    console.log('getting completion for: ', message);
   };
 
   return (
