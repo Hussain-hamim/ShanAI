@@ -62,8 +62,8 @@ const Page = () => {
   const openAI = useMemo(
     () =>
       new OpenAI({
-        apiKey: key || key1,
-        organization: organization || organization1,
+        apiKey: key1,
+        organization: organization1,
       }),
     []
   );
