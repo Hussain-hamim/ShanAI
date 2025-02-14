@@ -43,13 +43,13 @@ const Page = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [height, setHeight] = useState(0);
 
-  // const [key, setKey] = useMMKVString('apiKey', storage);
-  // const [organization, setOrganization] = useMMKVString('org', storage);
-  // const [gptVersion, setGptVersion] = useMMKVString('gptVersion', storage);
+  const [key, setKey] = useMMKVString('apiKey', storage);
+  const [organization, setOrganization] = useMMKVString('org', storage);
+  const [gptVersion, setGptVersion] = useMMKVString('gptVersion', storage);
 
-  const [key, setKey] = useState('apiKey');
-  const [organization, setOrganization] = useState('org');
-  const [gptVersion, setGptVersion] = useState('gpt-3.5-turbo');
+  // const [key, setKey] = useState('apiKey');
+  // const [organization, setOrganization] = useState('org');
+  // const [gptVersion, setGptVersion] = useState('gpt-3.5-turbo');
 
   if (!key || key === '' || !organization || organization === '') {
     return <Redirect href={'/(auth)/(modal)/settings'} />;
@@ -79,24 +79,6 @@ const Page = () => {
       model: gptVersion === '4' ? 'gpt-4' : 'gpt-3.5-turbo',
     });
   };
-
-  // useEffect(() => {
-  //   const handleMessage = (payload: any) => {
-  //     console.log('message: ', payload);
-  //     setMessages((messages) => {
-  //       const newMessage = payload.choices[0].delta.content;
-
-  //       if (newMessage) {
-  //         messages[length - 1].content += newMessage;
-  //         return [...messages];
-  //       }
-
-  //       if (payload.choices[0]?.finishReason) {
-  //         // save the message to the db
-  //         console.log('stream ended');
-  //       }
-  //     });
-  //   };
 
   useEffect(() => {
     const handleNewMessage = (payload: any) => {
@@ -130,23 +112,21 @@ const Page = () => {
   return (
     <View style={defaultStyles.pageContainer}>
       <Stack.Screen
-        options={
-          {
-            // headerTitle: () => (
-            //   <HeaderDropDown
-            //     title='ChatGPT'
-            //     onSelect={(key) => {
-            //       setGptVersion(key);
-            //     }}
-            //     selected={gptVersion}
-            //     items={[
-            //       { key: '3.5', title: 'GPT-3.5', icon: 'bolt' },
-            //       { key: '4', title: 'GPT-4', icon: 'sparkles' },
-            //     ]}
-            //   />
-            // ),
-          }
-        }
+        options={{
+          headerTitle: () => (
+            <HeaderDropDown
+              title='ChatGPT'
+              onSelect={(key) => {
+                setGptVersion(key);
+              }}
+              selected={gptVersion}
+              items={[
+                { key: '3.5', title: 'GPT-3.5', icon: 'bolt' },
+                { key: '4', title: 'GPT-4', icon: 'sparkles' },
+              ]}
+            />
+          ),
+        }}
       />
 
       <StatusBar style='dark' />
