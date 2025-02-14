@@ -14,9 +14,15 @@ import {
   Button,
 } from 'react-native';
 import { useMMKVString } from 'react-native-mmkv';
+
+//
+//
 const Page = () => {
-  const [key, setKey] = useMMKVString('apikey', keyStorage);
-  const [organization, setOrganization] = useMMKVString('org', keyStorage);
+  // const [key, setKey] = useMMKVString('apikey', keyStorage);
+  // const [organization, setOrganization] = useMMKVString('org', keyStorage);
+
+  const [key, setKey] = useState('apiKey');
+  const [organization, setOrganization] = useState('org');
 
   const [apiKey, setApiKey] = useState('');
   const [org, setOrg] = useState('');
