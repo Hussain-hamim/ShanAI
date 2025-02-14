@@ -21,7 +21,7 @@ import { Message, Role } from '@/utils/Interfaces';
 import { FlashList } from '@shopify/flash-list';
 import ChatMessage from '@/components/ChatMessage';
 import { useMMKVString } from 'react-native-mmkv';
-import { storage } from '@/utils/Storage';
+import { Storage } from '@/utils/Storage';
 import OpenAI from 'react-native-openai';
 
 const DUMMY_MESSAGES: Message[] = [
@@ -43,19 +43,30 @@ const Page = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [height, setHeight] = useState(0);
 
-  const [key, setKey] = useMMKVString('apiKey', storage);
-  const [organization, setOrganization] = useMMKVString('org', storage);
-  const [gptVersion, setGptVersion] = useMMKVString('gptVersion', storage);
+  const [key, setKey] = useMMKVString('apiKey', Storage);
+  const [organization, setOrganization] = useMMKVString('org', Storage);
+  const [gptVersion, setGptVersion] = useMMKVString('gptVersion', Storage);
 
   // const [key, setKey] = useState('apiKey');
   // const [organization, setOrganization] = useState('org');
   // const [gptVersion, setGptVersion] = useState('gpt-3.5-turbo');
 
-  if (!key || key === '' || !organization || organization === '') {
-    return <Redirect href={'/(auth)/(modal)/settings'} />;
-  }
+  // if (!key || key === '' || !organization || organization === '') {
+  //   return <Redirect href={'/(auth)/(modal)/settings'} />;
+  // }
 
-  const openAI = useMemo(() => new OpenAI({ apiKey: key, organization }), []);
+  const key1 =
+    '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';
+  const organization1 = 'org-zJcp8wvmMZVylTeDZU5uUjd8';
+
+  const openAI = useMemo(
+    () =>
+      new OpenAI({
+        apiKey: key || key1,
+        organization: organization || organization1,
+      }),
+    []
+  );
 
   const getCompletion = (message: string) => {
     console.log('getting completion for: ', message);
@@ -84,10 +95,12 @@ const Page = () => {
     const handleNewMessage = (payload: any) => {
       setMessages((messages) => {
         const newMessage = payload.choices[0]?.delta.content;
+
         if (newMessage) {
           messages[messages.length - 1].content += newMessage;
           return [...messages];
         }
+
         if (payload.choices[0]?.finishReason) {
           // save the last message
           console.log('stream ended');

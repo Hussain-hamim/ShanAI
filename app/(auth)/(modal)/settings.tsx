@@ -1,6 +1,6 @@
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
-import { keyStorage } from '@/utils/Storage';
+import { Storage } from '@/utils/Storage';
 import { useAuth } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -15,8 +15,8 @@ import {
 } from 'react-native';
 import { useMMKVString } from 'react-native-mmkv';
 const Page = () => {
-  const [key, setKey] = useMMKVString('apikey', keyStorage);
-  const [organization, setOrganization] = useMMKVString('org', keyStorage);
+  const [key, setKey] = useMMKVString('apikey', Storage);
+  const [organization, setOrganization] = useMMKVString('org', Storage);
 
   const [apiKey, setApiKey] = useState('');
   const [org, setOrg] = useState('');
@@ -27,7 +27,7 @@ const Page = () => {
   const saveApiKey = async () => {
     setKey(apiKey);
     setOrganization(org);
-    router.navigate('/(auth)/(drawer)/(chat)/new');
+    router.push('/(auth)/(drawer)/(chat)/new');
   };
 
   const removeApiKey = async () => {
@@ -40,7 +40,7 @@ const Page = () => {
       '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'
     );
     setOrganization('org-zJcp8wvmMZVylTeDZU5uUjd8');
-    router.navigate('/(auth)/(drawer)/(chat)/new');
+    router.push('/(auth)/(drawer)/(chat)/new');
   };
 
   return (

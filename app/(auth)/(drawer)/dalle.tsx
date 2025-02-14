@@ -46,7 +46,7 @@ import MessageInput from '@/components/MessageInput';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
 import { Message, Role } from '@/utils/Interfaces';
-import { keyStorage } from '@/utils/Storage';
+import { Storage } from '@/utils/Storage';
 import { FlashList } from '@shopify/flash-list';
 import { Redirect, Stack } from 'expo-router';
 import React from 'react';
@@ -74,8 +74,8 @@ import OpenAI from 'react-native-openai';
 
 const Page = () => {
   const [height, setHeight] = useState(0);
-  const [key, setKey] = useMMKVString('apikey', keyStorage);
-  const [organization, setOrganization] = useMMKVString('org', keyStorage);
+  const [key, setKey] = useMMKVString('apikey', Storage);
+  const [organization, setOrganization] = useMMKVString('org', Storage);
   const [messages, setMessages] = useState<Message[]>([]);
   const [working, setWorking] = useState(false);
 
