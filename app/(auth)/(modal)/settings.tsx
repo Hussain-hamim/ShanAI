@@ -14,15 +14,9 @@ import {
   Button,
 } from 'react-native';
 import { useMMKVString } from 'react-native-mmkv';
-
-//
-//
 const Page = () => {
   const [key, setKey] = useMMKVString('apikey', keyStorage);
   const [organization, setOrganization] = useMMKVString('org', keyStorage);
-
-  // const [key, setKey] = useState('apiKey');
-  // const [organization, setOrganization] = useState('org');
 
   const [apiKey, setApiKey] = useState('');
   const [org, setOrg] = useState('');
@@ -33,12 +27,20 @@ const Page = () => {
   const saveApiKey = async () => {
     setKey(apiKey);
     setOrganization(org);
-    router.push('/(auth)/(drawer)/(chat)/new');
+    router.navigate('/(auth)/(drawer)/(chat)/new');
   };
 
   const removeApiKey = async () => {
     setKey('');
     setOrganization('');
+  };
+
+  const defaultKey = () => {
+    setKey(
+      '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'
+    );
+    setOrganization('org-zJcp8wvmMZVylTeDZU5uUjd8');
+    router.navigate('/(auth)/(drawer)/(chat)/new');
   };
 
   return (
@@ -81,6 +83,13 @@ const Page = () => {
           >
             <Text style={styles.buttonText}>Save API Key</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[defaultStyles.btn, { backgroundColor: Colors.primary }]}
+            onPress={defaultKey}
+          >
+            <Text style={styles.buttonText}>Save Default Key</Text>
+          </TouchableOpacity>
         </>
       )}
       <Button title='Sign Out' onPress={() => signOut()} color={Colors.grey} />
@@ -92,6 +101,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingVertical: 20,
+    gap: 5,
   },
   label: {
     fontSize: 18,
