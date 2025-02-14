@@ -14,6 +14,7 @@ import {
   Button,
 } from 'react-native';
 import { useMMKVString } from 'react-native-mmkv';
+
 const Page = () => {
   const [key, setKey] = useMMKVString('apikey', Storage);
   const [organization, setOrganization] = useMMKVString('org', Storage);
@@ -67,6 +68,7 @@ const Page = () => {
             placeholder='Enter your API key'
             autoCorrect={false}
             autoCapitalize='none'
+            multiline
           />
           <TextInput
             style={styles.input}
