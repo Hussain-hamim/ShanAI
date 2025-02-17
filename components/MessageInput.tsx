@@ -5,7 +5,7 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from '@expo/vector-icons';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import Animated, {
   Extrapolation,
@@ -29,9 +29,10 @@ const ATouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 export type MessageInputProps = {
   // TODO:
   onShouldSendMessage: (message: string) => void;
+  loading: boolean;
 };
 
-const MessageInput = ({ onShouldSendMessage }: MessageInputProps) => {
+const MessageInput = ({ onShouldSendMessage, loading }: MessageInputProps) => {
   const [message, setMessage] = useState('');
   const { bottom } = useSafeAreaInsets();
   const expanded = useSharedValue(0);
@@ -142,15 +143,19 @@ const MessageInput = ({ onShouldSendMessage }: MessageInputProps) => {
             <Ionicons name='arrow-up-circle' size={30} color={Colors.grey} />
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity>
-            {/* <Ionicons name='mic' size={30} color={Colors.grey} /> */}
-            {/* <FontAwesome6 name='microphone' size={30} color={Colors.grey} /> */}
-            <MaterialCommunityIcons
-              name='chat-plus'
-              size={30}
-              color={Colors.grey}
-            />
-          </TouchableOpacity>
+          <>
+            {loading ? (
+              <ActivityIndicator size='large' color='gray' />
+            ) : (
+              <TouchableOpacity>
+                <MaterialCommunityIcons
+                  name='chat-plus'
+                  size={30}
+                  color={Colors.grey}
+                />
+              </TouchableOpacity>
+            )}
+          </>
         )}
       </View>
     </BlurView>

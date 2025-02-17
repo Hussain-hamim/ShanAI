@@ -43,6 +43,7 @@ const DUMMY_MESSAGES: Message[] = [
 const Page = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [height, setHeight] = useState(0);
+  const [loading, setloading] = useState(false);
 
   const getCompletion = async (message: any) => {
     setMessages((prev) => {
@@ -58,6 +59,8 @@ const Page = () => {
     //
 
     try {
+      setloading(true);
+
       const response = await sendMessage(message);
 
       // Add AI response
@@ -83,6 +86,8 @@ const Page = () => {
         ];
         return messages;
       });
+    } finally {
+      setloading(false);
     }
   };
 
@@ -128,7 +133,7 @@ const Page = () => {
 
         <FlashList
           data={messages}
-          renderItem={({ item }) => <ChatMessage {...item} />}
+          renderItem={({ item }) => <ChatMessage loading={loading} {...item} />}
           estimatedItemSize={400}
           keyboardDismissMode='on-drag'
           contentContainerStyle={{
@@ -149,7 +154,7 @@ const Page = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         {messages.length === 0 && <MessageIdeas onSelectCard={getCompletion} />}
-        <MessageInput onShouldSendMessage={getCompletion} />
+        <MessageInput loading={loading} onShouldSendMessage={getCompletion} />
       </KeyboardAvoidingView>
     </View>
   );

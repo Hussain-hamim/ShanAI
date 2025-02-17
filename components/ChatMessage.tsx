@@ -58,7 +58,16 @@ const ChatMessage = ({
         />
       )}
 
-      <Text style={styles.text}>{content}</Text>
+      <Text
+        style={[
+          styles.text,
+          role === Role.User
+            ? { backgroundColor: 'lightgray', borderRadius: 5 }
+            : {},
+        ]}
+      >
+        {content}
+      </Text>
 
       {/* {loading ? (
         <View style={styles.loading}>
@@ -132,8 +141,9 @@ const styles = StyleSheet.create({
   text: {
     padding: 4,
     fontSize: 16,
+    paddingHorizontal: 10,
     flexWrap: 'wrap',
-    flex: 1,
+    // flex: 1,
   },
   previewImage: {
     width: 240,
