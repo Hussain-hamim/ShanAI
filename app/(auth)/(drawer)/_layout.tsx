@@ -176,7 +176,7 @@ const Layout = () => {
         name='(chat)/new'
         getId={() => Math.random().toString()}
         options={{
-          title: 'ChatGPT',
+          title: 'Shan AI', // shan ai
           drawerIcon: () => (
             <View style={[styles.item, { backgroundColor: '#000' }]}>
               <Image

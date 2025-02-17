@@ -35,7 +35,7 @@ const content = [
     fontColor: Colors.yellow,
   },
   {
-    title: 'ChatGPT.',
+    title: 'ShanAI.',
     bg: Colors.green,
     fontColor: Colors.pink,
   },
