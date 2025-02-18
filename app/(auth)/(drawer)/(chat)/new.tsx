@@ -23,7 +23,8 @@ import ChatMessage from '@/components/ChatMessage';
 import { useMMKVString } from 'react-native-mmkv';
 import { Storage } from '@/utils/Storage';
 import OpenAI from 'react-native-openai';
-import { sendMessage } from '@/utils/api';
+import { streamMessage } from '@/utils/api';
+// import { sendMessage } from '@/utils/api';
 
 const DUMMY_MESSAGES: Message[] = [
   { content: 'Hello, how can i help you today!', role: Role.Bot },
@@ -45,51 +46,72 @@ const Page = () => {
   const [height, setHeight] = useState(0);
   const [loading, setloading] = useState(false);
 
-  const getCompletion = async (message: any) => {
-    setMessages((prev) => {
-      const messages = [
-        ...prev,
-        {
-          content: message,
-          role: Role.User,
-        },
-      ];
-      return messages;
-    });
-    //
+  const updateLastMessage = (chunk: string) => {
+    const AllMessages = [...messages];
 
-    try {
-      setloading(true);
+    const lastMessage = AllMessages[AllMessages.length - 1];
 
-      const response = await sendMessage(message);
-
-      // Add AI response
-      setMessages((prev) => {
-        const messages = [
-          ...prev,
-          {
-            content: response,
-            role: Role.Bot,
-          },
-        ];
-        return messages;
-      });
-    } catch (error: any) {
-      // Add error message with specific error details
-      setMessages((prev) => {
-        const messages = [
-          ...prev,
-          {
-            content: error.message,
-            role: Role.Bot,
-          },
-        ];
-        return messages;
-      });
-    } finally {
-      setloading(false);
+    if (lastMessage) {
+      AllMessages[AllMessages.length - 1] = {
+        ...lastMessage,
+        content: lastMessage.content + chunk,
+        role: Role.Bot,
+      };
     }
+    return { AllMessages };
   };
+
+  const getCompletion = useCallback(
+    async (message: any) => {
+      setMessages((prev) => {
+        const messages = [
+          ...prev,
+          {
+            content: message,
+            role: Role.User,
+          },
+        ];
+        return messages;
+      });
+      //
+
+      try {
+        setloading(true);
+
+        // const response = await sendMessage(message);
+        for await (const chunk of streamMessage(message)) {
+          // Add AI response
+          // setMessages((prev) => {
+          //   const messages = [
+          //     ...prev,
+          //     {
+          //       content: response,
+          //       role: Role.Bot,
+          //     },
+          //   ];
+          //   return messages;
+          // });
+          //
+          updateLastMessage(chunk);
+        }
+      } catch (error: any) {
+        // Add error message with specific error details
+        setMessages((prev) => {
+          const messages = [
+            ...prev,
+            {
+              content: error.message,
+              role: Role.Bot,
+            },
+          ];
+          return messages;
+        });
+      } finally {
+        setloading(false);
+      }
+    },
+    [messages, setloading, updateLastMessage]
+  );
 
   const onLayout = (event: any) => {
     // invoke on layout changes
