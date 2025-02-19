@@ -56,7 +56,7 @@ const ChatMessageDalle = ({
         </View>
       ) : (
         <Image
-          source={{ uri: 'https://galaxies.dev/img/meerkat_2.jpg' }}
+          source={require('@/assets/images/anime-pfp.jpg')}
           style={styles.avatar}
         />
       )}
