@@ -47,8 +47,8 @@ const Layout = () => {
           ),
         }}
       />
-      {/* <Stack.Screen
-        name='(modal)/image/[url]'
+      <Stack.Screen
+        name='(modal)/[url]'
         options={{
           headerTitle: '',
           presentation: 'fullScreenModal',
@@ -66,7 +66,7 @@ const Layout = () => {
           ),
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name='(modal)/purchase'
         options={{
           headerTitle: '',
