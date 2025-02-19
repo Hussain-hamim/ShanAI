@@ -56,20 +56,20 @@ const InitialLayout = () => {
   }, [loaded]);
 
   useEffect(() => {
-    // if (!isLoaded) return;
+    if (!isLoaded) return;
 
     const inAuthGroup = segments[0] === '(auth)';
 
-    if (1 === 1) {
-      // if (isSignedIn && !inAuthGroup) {
+    // if (1 === 1) {
+    if (isSignedIn && !inAuthGroup) {
       //bring the user inside
       router.replace('/(auth)/(drawer)/(chat)/new');
     } else if (!isSignedIn && inAuthGroup) {
       // kick the user out
       router.replace('/');
     }
-    // }, [isSignedIn]);
-  }, []);
+  }, [isSignedIn]);
+  // }, []);
 
   // if (!loaded || !isLoaded) {
   //   return (
@@ -87,11 +87,11 @@ const InitialLayout = () => {
         options={{
           presentation: 'modal',
           title: '',
-          headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()}>
-              <Ionicons name='close-outline' size={28} />
-            </TouchableOpacity>
-          ),
+          // headerLeft: () => (
+          //   <TouchableOpacity onPress={() => router.back()}>
+          //     <Ionicons name='close-outline' size={28} />
+          //   </TouchableOpacity>
+          // ),
         }}
       />
       <Stack.Screen name='(auth)' options={{ headerShown: false }} />

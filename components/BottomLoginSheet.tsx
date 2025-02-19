@@ -50,7 +50,31 @@ const BottomLoginSheet = () => {
         asChild
       >
         <TouchableOpacity>
+          <Ionicons
+            name='log-in-outline'
+            size={26}
+            style={styles.btnIcon}
+            color={'green'}
+          />
           <Text style={styles.btnDarkText}>Log in</Text>
+        </TouchableOpacity>
+      </Link>
+      <Link
+        href={{
+          pathname: '/(auth)/(drawer)/(chat)/new',
+          params: { type: 'guest' },
+        }}
+        style={[defaultStyles.btn, styles.btnOutline]}
+        asChild
+      >
+        <TouchableOpacity>
+          <Ionicons
+            name='bag-outline'
+            size={20}
+            style={styles.btnIcon}
+            color={'purple'}
+          />
+          <Text style={styles.btnDarkText}>Log in as Guest</Text>
         </TouchableOpacity>
       </Link>
     </View>

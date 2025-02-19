@@ -51,75 +51,7 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
       >
         {/* we spread the items from the existing drawer component vis props */}
         <DrawerItemList {...props} />
-        <View style={{ gap: 10 }}>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-          <Text>Here come some content</Text>
-        </View>
+        <View style={{ gap: 10 }}>{}</View>
       </DrawerContentScrollView>
 
       {/* FOOTER */}
@@ -131,7 +63,7 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
               source={require('@/assets/images/anime-pfp.jpg')}
               style={styles.avatar}
             />
-            <Text style={styles.userName}>Meerakat</Text>
+            <Text style={styles.userName}>Hussain Hamim</Text>
             <Text style={{ color: Colors.greyLight }}>v1.0.0 - 2025</Text>
             <Ionicons
               name='ellipsis-horizontal'
@@ -214,7 +146,7 @@ const Layout = () => {
           ),
         }}
       />
-      //
+
       <Drawer.Screen
         name='explore'
         options={{
@@ -267,8 +199,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   userName: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '500',
     flex: 1,
   },
   item: {

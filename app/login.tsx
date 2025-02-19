@@ -98,6 +98,7 @@ const Login = () => {
           autoCapitalize='none'
           value={emailAddress}
           onChangeText={setEmailAddress}
+          returnKeyType='next'
         />
         <TextInput
           style={styles.inputField}
@@ -106,6 +107,7 @@ const Login = () => {
           value={password}
           onChangeText={setPassword}
           secureTextEntry
+          autoFocus
         />
       </View>
 

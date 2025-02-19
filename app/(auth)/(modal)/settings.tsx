@@ -97,7 +97,14 @@ const Page = () => {
           </TouchableOpacity>
         </>
       )}
-      <Button title='Sign Out' onPress={() => signOut()} color={Colors.grey} />
+      <Button
+        title='Sign Out'
+        onPress={() => {
+          signOut();
+          router.push('/');
+        }}
+        color={Colors.grey}
+      />
     </View>
   );
 };
