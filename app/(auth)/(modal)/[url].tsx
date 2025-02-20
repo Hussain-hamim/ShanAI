@@ -23,6 +23,7 @@ import * as Clipboard from 'expo-clipboard';
 import Toast from 'react-native-root-toast';
 import { RootSiblingParent } from 'react-native-root-siblings';
 import { StatusBar } from 'expo-status-bar';
+import DropDownMenu from '@/components/DropDownMenu';
 
 const Page = () => {
   const { url, prompt } = useLocalSearchParams<{
@@ -31,56 +32,149 @@ const Page = () => {
   }>();
   const { bottom } = useSafeAreaInsets();
 
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  const snapPoints = useMemo(() => ['40%'], []);
+
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+
+  const handleCloseModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.dismiss();
+  }, []);
+
   const onCopyPrompt = () => {
-    console.log('copy prompt');
+    Clipboard.setStringAsync(prompt!);
+
+    Toast.show('Prompt copied to clipboard', {
+      duration: Toast.durations.SHORT,
+      position: Toast.positions.BOTTOM,
+      shadow: true,
+      animation: true,
+      hideOnPress: true,
+      delay: 0,
+    });
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar />
+    <RootSiblingParent>
+      <BottomSheetModalProvider>
+        <View style={styles.container}>
+          <StatusBar />
+          <Stack.Screen
+            options={{
+              headerRight: () => (
+                <DropDownMenu
+                  items={[
+                    { key: '1', title: 'View prompt', icon: 'info.circle' },
+                    {
+                      key: '2',
+                      title: 'Learn more',
+                      icon: 'questionmark.circle',
+                    },
+                  ]}
+                  onSelect={handlePresentModalPress}
+                />
+              ),
+            }}
+          />
 
-      <ImageZoom
-        uri={url}
-        style={styles.image}
-        minScale={0.5}
-        maxScale={5}
-        doubleTapScale={2}
-        isDoubleTapEnabled
-        isSingleTapEnabled
-        resizeMode='contain'
-      />
+          <ImageZoom
+            uri={url}
+            style={styles.image}
+            minScale={0.5}
+            maxScale={5}
+            doubleTapScale={2}
+            isDoubleTapEnabled
+            isSingleTapEnabled
+            resizeMode='contain'
+          />
 
-      <BlurView style={styles.blurview} intensity={100} tint='dark'>
-        <View style={styles.row}>
-          <TouchableOpacity style={{ alignItems: 'center' }}>
-            <Ionicons
-              name='chatbubble-ellipses-outline'
-              size={24}
-              color='white'
-            />
-            <Text style={styles.btnText}>Edit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={{ alignItems: 'center' }}>
-            <Ionicons name='brush-outline' size={24} color='white' />
-            <Text style={styles.btnText}>Select</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ alignItems: 'center' }}
-            onPress={() => downloadAndSaveImage(url)}
-          >
-            <Octicons name='download' size={24} color='white' />
-            <Text style={styles.btnText}>Save</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ alignItems: 'center' }}
-            onPress={() => shareImage(url)}
-          >
-            <Octicons name='share' size={24} color='white' />
-            <Text style={styles.btnText}>Share</Text>
-          </TouchableOpacity>
+          <BlurView style={styles.blurview} intensity={100} tint='dark'>
+            <View style={styles.row}>
+              <TouchableOpacity
+                onPress={handlePresentModalPress}
+                style={{ alignItems: 'center' }}
+              >
+                <Ionicons
+                  name='chatbubble-ellipses-outline'
+                  size={24}
+                  color='white'
+                />
+                <Text style={styles.btnText}>Edit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={{ alignItems: 'center' }}>
+                <Ionicons name='brush-outline' size={24} color='white' />
+                <Text style={styles.btnText}>Select</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ alignItems: 'center' }}
+                onPress={() => downloadAndSaveImage(url)}
+              >
+                <Octicons name='download' size={24} color='white' />
+                <Text style={styles.btnText}>Save</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ alignItems: 'center' }}
+                onPress={() => shareImage(url)}
+              >
+                <Octicons name='share' size={24} color='white' />
+                <Text style={styles.btnText}>Share</Text>
+              </TouchableOpacity>
+            </View>
+          </BlurView>
         </View>
-      </BlurView>
-    </View>
+
+        <BottomSheetModal
+          ref={bottomSheetModalRef}
+          index={0}
+          snapPoints={snapPoints}
+          backgroundStyle={{ backgroundColor: Colors.grey }}
+          handleIndicatorStyle={{ backgroundColor: Colors.greyLight }}
+        >
+          <View
+            style={[
+              styles.modalContainer,
+              { paddingBottom: bottom, flex: 1, marginBottom: 20 },
+            ]}
+          >
+            <BottomSheetScrollView>
+              <View style={{ flex: 1 }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Text style={styles.titleText}>Prompt</Text>
+                  <Pressable
+                    onPress={handleCloseModalPress}
+                    style={styles.closeBtn}
+                  >
+                    <Ionicons
+                      name='close-outline'
+                      size={24}
+                      color={Colors.greyLight}
+                    />
+                  </Pressable>
+                </View>
+                <Text style={styles.promptText}>{prompt}</Text>
+              </View>
+            </BottomSheetScrollView>
+            <TouchableOpacity
+              style={[
+                defaultStyles.btn,
+                { backgroundColor: '#fff', marginTop: 10 },
+              ]}
+              onPress={onCopyPrompt}
+            >
+              <Text style={styles.buttonText}>Copy</Text>
+            </TouchableOpacity>
+          </View>
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
+    </RootSiblingParent>
   );
 };
 

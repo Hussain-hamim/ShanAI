@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import * as ContextMenu from 'zeego/context-menu';
 
-const ChatMessageDalle = ({
+const ChatMessageDalle   = ({
   content,
   role,
   imageUrl,

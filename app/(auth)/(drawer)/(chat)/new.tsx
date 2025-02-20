@@ -380,19 +380,19 @@ const Page = () => {
   const [loading, setLoading] = useState(false);
   const flatListRef = useRef<FlashList>(null);
 
-  const updateLastMessage = (chunk: string) => {
-    const allMessages = [...messages];
-    const lastMessage = allMessages[allMessages.length - 1];
+  // const updateLastMessage = (chunk: string) => {
+  //   const allMessages = [...messages];
+  //   const lastMessage = allMessages[allMessages.length - 1];
 
-    if (lastMessage) {
-      allMessages[allMessages.length - 1] = {
-        ...lastMessage,
-        content: lastMessage.content + chunk,
-        role: Role.Bot,
-      };
-    }
-    return { allMessages };
-  };
+  //   if (lastMessage) {
+  //     allMessages[allMessages.length - 1] = {
+  //       ...lastMessage,
+  //       content: lastMessage.content + chunk,
+  //       role: Role.Bot,
+  //     };
+  //   }
+  //   return { allMessages };
+  // };
 
   const getCompletion = useCallback(
     async (message: string) => {
