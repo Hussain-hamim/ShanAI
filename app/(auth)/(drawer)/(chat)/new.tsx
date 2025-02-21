@@ -1,3 +1,17 @@
+export { default } from '@/components/ChatPage';
+
+//
+
+//
+
+//
+
+///
+
+///
+
+//
+
 // import {
 //   View,
 //   Text,
@@ -351,154 +365,3 @@
 
 // export default Page;
 /////////////////////////////////////
-
-import React, { useState, useCallback, useRef } from 'react';
-import {
-  View,
-  Text,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Image,
-} from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { defaultStyles } from '@/constants/Styles';
-import { Stack } from 'expo-router';
-import HeaderDropDown from '@/components/HeaderDropDown';
-import MessageInput from '@/components/MessageInput';
-import MessageIdeas from '@/components/MessageIdeas';
-import { Message, Role } from '@/utils/Interfaces';
-import { FlashList, FlashListProps } from '@shopify/flash-list';
-import ChatMessage from '@/components/ChatMessage';
-import { streamMessage } from '@/utils/api';
-import { FlatList } from 'react-native-gesture-handler';
-import { FlashListState } from '@shopify/flash-list/dist/FlashList';
-
-const Page = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [height, setHeight] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const flatListRef = useRef<FlashList>(null);
-
-  // const updateLastMessage = (chunk: string) => {
-  //   const allMessages = [...messages];
-  //   const lastMessage = allMessages[allMessages.length - 1];
-
-  //   if (lastMessage) {
-  //     allMessages[allMessages.length - 1] = {
-  //       ...lastMessage,
-  //       content: lastMessage.content + chunk,
-  //       role: Role.Bot,
-  //     };
-  //   }
-  //   return { allMessages };
-  // };
-
-  const getCompletion = useCallback(
-    async (message: string) => {
-      setMessages((prev) => [
-        ...prev,
-        { content: message, role: Role.User },
-        { content: '', role: Role.Bot },
-      ]);
-
-      try {
-        setLoading(true);
-
-        for await (const chunk of streamMessage(message)) {
-          setMessages((prev) => {
-            const updatedMessages = [...prev];
-            updatedMessages[updatedMessages.length - 1].content += chunk;
-            return updatedMessages;
-          });
-        }
-      } catch (error) {
-        console.error('Error streaming message:', error);
-        setMessages((prev) => [
-          ...prev,
-          {
-            content: 'Error fetching response. Please try again.',
-            role: Role.Bot,
-          },
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [messages]
-  );
-
-  const onLayout = (event: any) => {
-    const { height } = event.nativeEvent.layout;
-    setHeight(height);
-  };
-
-  return (
-    <View style={defaultStyles.pageContainer}>
-      <Stack.Screen options={{}} />
-      <StatusBar style='dark' />
-      <View style={{ flex: 1 }} onLayout={onLayout}>
-        {messages.length === 0 && (
-          <View style={[styles.logoContainer, { marginTop: height / 2 - 100 }]}>
-            <Image
-              source={require('@/assets/images/logo-white.png')}
-              style={styles.image}
-            />
-          </View>
-        )}
-        <FlashList
-          ref={flatListRef}
-          data={messages}
-          renderItem={({ item }) => <ChatMessage loading={loading} {...item} />}
-          estimatedItemSize={400}
-          keyboardDismissMode='on-drag'
-          onContentSizeChange={() => {
-            if (messages.length > 0) {
-              // if (loading) {
-              // flatListRef.current?.scrollToEnd({ animated: true });
-            }
-          }}
-          contentContainerStyle={{
-            paddingBottom: 150,
-            paddingTop: 30,
-          }}
-        />
-      </View>
-      <KeyboardAvoidingView
-        keyboardVerticalOffset={70}
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          width: '100%',
-        }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        {messages.length === 0 && <MessageIdeas onSelectCard={getCompletion} />}
-        <MessageInput loading={loading} onShouldSendMessage={getCompletion} />
-      </KeyboardAvoidingView>
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  logoContainer: {
-    alignSelf: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 50,
-    height: 50,
-    backgroundColor: '#000',
-    borderRadius: 50,
-  },
-  image: {
-    width: 30,
-    height: 30,
-    resizeMode: 'cover',
-  },
-  page: {
-    flex: 1,
-  },
-});
-
-export default Page;
