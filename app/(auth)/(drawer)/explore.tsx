@@ -25,6 +25,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import React from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 const sections = [
@@ -103,6 +104,14 @@ const explore = () => {
     <View style={styles.container}>
       <Drawer.Screen
         options={{
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={{ marginLeft: 15, marginRight: 40 }}
+            >
+              <Ionicons name='close-outline' size={30} color={Colors.grey} />
+            </TouchableOpacity>
+          ),
           headerBackground: () => (
             <BlurView
               intensity={110}
