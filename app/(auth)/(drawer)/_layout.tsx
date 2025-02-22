@@ -120,6 +120,24 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
           //       }
           //     />
           //     <ContextMenu.Content>
+
+          //           <ContextMenu.Preview>
+          //             {()=>(
+          //               <View
+          //               style={{
+          //                 alignItems: 'center',
+          //                 justifyContent: 'center',
+          //                 padding: 16,
+          //                 height: 200,
+          //                 width: 250,
+          //                 backgroundColor: '#fff'
+          //               }}
+          //               >
+          // <Text>{chat.title}</Text>
+          //               </View>
+          //             )}
+          //           </ContextMenu.Preview>
+
           //       <ContextMenu.Item
           //         onSelect={() => onRenameChat(chat.id)}
           //         key='rename'
