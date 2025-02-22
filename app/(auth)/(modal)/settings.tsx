@@ -2,7 +2,7 @@ import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
 import { Storage } from '@/utils/Storage';
 import { useAuth } from '@clerk/clerk-expo';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import React from 'react';
 import { useState } from 'react';
 import {
@@ -39,14 +39,6 @@ const Page = () => {
     setOrganization('');
   };
 
-  const defaultKey = () => {
-    setKey(
-      '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'
-    );
-    setOrganization('org-zJcp8wvmMZVylTeDZU5uUjd8');
-    router.push('/(auth)/(drawer)/(chat)/new');
-  };
-
   return (
     <View style={styles.container}>
       {key && key !== '' && (
@@ -72,6 +64,7 @@ const Page = () => {
             autoCorrect={false}
             autoCapitalize='none'
             multiline
+            hitSlop={200}
           />
           <TextInput
             style={styles.input}
@@ -80,6 +73,7 @@ const Page = () => {
             placeholder='Your organization'
             autoCorrect={false}
             autoCapitalize='none'
+            hitSlop={200}
           />
 
           <TouchableOpacity
@@ -90,21 +84,16 @@ const Page = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[defaultStyles.btn, { backgroundColor: Colors.primary }]}
-            onPress={defaultKey}
+            style={[defaultStyles.btn, { backgroundColor: Colors.orange }]}
+            onPress={async () => {
+              await signOut();
+              router.replace('/');
+            }}
           >
-            <Text style={styles.buttonText}>Save Default Key</Text>
+            <Text style={styles.buttonText}>Sign Out</Text>
           </TouchableOpacity>
         </>
       )}
-      <Button
-        title='Sign Out'
-        onPress={() => {
-          signOut();
-          router.push('/');
-        }}
-        color={Colors.grey}
-      />
     </View>
   );
 };

@@ -1,8 +1,9 @@
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
 import { useSignIn, useSignUp } from '@clerk/clerk-expo';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import React from 'react';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -10,6 +11,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -50,7 +52,6 @@ const Login = () => {
   };
 
   const onSignInPress = async () => {
-    //
     if (!isLoaded) return;
     setLoading(true);
 
@@ -74,58 +75,61 @@ const Login = () => {
       keyboardVerticalOffset={1}
       style={styles.container}
     >
-      <StatusBar style='dark' />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <StatusBar style='dark' />
 
-      {loading && (
-        <View style={defaultStyles.loadingOverlay}>
-          <ActivityIndicator size='large' color='#fff' />
+        {loading && (
+          <View style={defaultStyles.loadingOverlay}>
+            <ActivityIndicator size='large' color='#fff' />
+          </View>
+        )}
+
+        <Image
+          style={styles.logo}
+          source={require('../assets/images/logo-dark.png')}
+        />
+
+        <Text style={styles.title}>
+          {type === 'login' ? 'Welcome back' : 'Create your account'}
+        </Text>
+
+        <View style={{ marginBottom: 30 }}>
+          <TextInput
+            style={styles.inputField}
+            placeholder='Email'
+            autoCapitalize='none'
+            value={emailAddress}
+            onChangeText={setEmailAddress}
+            returnKeyType='next'
+            hitSlop={200}
+          />
+          <TextInput
+            style={styles.inputField}
+            placeholder='Password'
+            autoCapitalize='none'
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            hitSlop={200}
+          />
         </View>
-      )}
 
-      <Image
-        style={styles.logo}
-        source={require('../assets/images/logo-dark.png')}
-      />
-
-      <Text style={styles.title}>
-        {type === 'login' ? 'Welcome back' : 'Create your account'}
-      </Text>
-
-      <View style={{ marginBottom: 30 }}>
-        <TextInput
-          style={styles.inputField}
-          placeholder='Email'
-          autoCapitalize='none'
-          value={emailAddress}
-          onChangeText={setEmailAddress}
-          returnKeyType='next'
-        />
-        <TextInput
-          style={styles.inputField}
-          placeholder='Password'
-          autoCapitalize='none'
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          autoFocus
-        />
-      </View>
-
-      {type === 'login' ? (
-        <TouchableOpacity
-          onPress={onSignInPress}
-          style={[defaultStyles.btn, styles.btnPrimary]}
-        >
-          <Text style={styles.btnPrimaryText}>Login</Text>
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          onPress={onSignUpPress}
-          style={[defaultStyles.btn, styles.btnPrimary]}
-        >
-          <Text style={styles.btnPrimaryText}>Create Account</Text>
-        </TouchableOpacity>
-      )}
+        {type === 'login' ? (
+          <TouchableOpacity
+            onPress={onSignInPress}
+            style={[defaultStyles.btn, styles.btnPrimary]}
+          >
+            <Text style={styles.btnPrimaryText}>Login</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            onPress={onSignUpPress}
+            style={[defaultStyles.btn, styles.btnPrimary]}
+          >
+            <Text style={styles.btnPrimaryText}>Create Account</Text>
+          </TouchableOpacity>
+        )}
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 };

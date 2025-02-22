@@ -141,7 +141,11 @@ const MessageInput = ({ onShouldSendMessage, loading }: MessageInputProps) => {
 
         {message.length > 0 ? (
           <TouchableOpacity onPress={onSend}>
-            <Ionicons name='arrow-up-circle' size={30} color={Colors.grey} />
+            <Ionicons
+              name='arrow-up-circle-outline'
+              size={35}
+              color={Colors.grey}
+            />
           </TouchableOpacity>
         ) : (
           <>
@@ -150,9 +154,10 @@ const MessageInput = ({ onShouldSendMessage, loading }: MessageInputProps) => {
             ) : (
               <TouchableOpacity>
                 <MaterialCommunityIcons
-                  name='chat-plus'
+                  name='microphone'
                   size={30}
-                  color={Colors.grey}
+                  color={'white'}
+                  style={{ backgroundColor: 'green', borderRadius: 15 }}
                 />
               </TouchableOpacity>
             )}

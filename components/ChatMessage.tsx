@@ -106,9 +106,10 @@ const styles = StyleSheet.create({
     // marginVertical: 12,
   },
   item: {
+    marginTop: 20,
+
     borderRadius: 15,
     overflow: 'hidden',
-    marginTop: 15,
   },
   btnImage: {
     margin: 6,
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
     height: 16,
   },
   avatar: {
-    marginTop: 15,
+    marginTop: 20,
 
     width: 30,
     height: 30,

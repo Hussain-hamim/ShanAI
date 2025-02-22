@@ -75,6 +75,7 @@ const ChatPage = () => {
         { content: message, role: Role.User },
         { content: '', role: Role.Bot },
       ]);
+      messages.push();
 
       try {
         setLoading(true);
@@ -150,9 +151,7 @@ const ChatPage = () => {
           keyboardDismissMode='on-drag'
           onContentSizeChange={() => {
             if (messages.length > 0) {
-              if (loading) {
-                flatListRef.current?.scrollToEnd({ animated: true });
-              }
+              //   flatListRef.current?.scrollToEnd({ animated: true }); // scroll to bottom while streaming have a bug
             }
           }}
           contentContainerStyle={{

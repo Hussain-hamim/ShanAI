@@ -13,7 +13,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import { Drawer } from 'expo-router/drawer';
 import Colors from '@/constants/Colors';
-import { Link, router, useNavigation } from 'expo-router';
+import { Link, useNavigation, useRouter } from 'expo-router';
 import { FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { DrawerActions, NavigationContainer } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -33,6 +33,7 @@ import {
 } from '@/utils/Database';
 import { useSQLiteContext } from 'expo-sqlite';
 import * as ContextMenu from 'zeego/context-menu';
+import { StatusBar } from 'expo-status-bar';
 
 // a customized drawer component
 export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
@@ -40,6 +41,8 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
   const isDrawerOpen = useDrawerStatus() === 'open';
   const [history, sethistory] = useState<Chat[]>([]);
   const db = useSQLiteContext();
+  const router = useRouter();
+  const [colorTheme, setcolorTheme] = useState(false);
 
   useEffect(() => {
     if (isDrawerOpen) {
@@ -109,10 +112,26 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
   };
 
   return (
-    <View style={{ flex: 1, marginTop: top + 16 }}>
+    <View
+      style={{
+        backgroundColor: colorTheme ? 'black' : 'white',
+        flex: 1,
+        paddingTop: top + 12,
+      }}
+    >
+      <StatusBar style={colorTheme ? 'light' : 'dark'} />
       {/* HEADER */}
-      <View style={{ backgroundColor: 'white', paddingBottom: 16 }}>
-        <View style={styles.searchSection}>
+      <View
+        style={{
+          backgroundColor: colorTheme ? 'black' : 'white',
+          // backgroundColor: 'white',
+          paddingBottom: 16,
+          flexDirection: 'row',
+          // justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <View style={[styles.searchSection, { width: '80%' }]}>
           <Ionicons
             name='search'
             style={styles.searchIcon}
@@ -125,6 +144,14 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
             underlineColorAndroid={'transparent'}
           />
         </View>
+        <TouchableOpacity>
+          <Ionicons
+            name={colorTheme ? 'moon' : 'sunny'}
+            size={24}
+            color={Colors.greyLight}
+            onPress={() => setcolorTheme(!colorTheme)}
+          />
+        </TouchableOpacity>
       </View>
 
       {/* MIDDLE */}
@@ -196,7 +223,7 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
               // key={chat.id}
               label={chat.title}
               onPress={() => router.push(`/(auth)/(drawer)/(chat)/${chat.id}`)}
-              inactiveTintColor='#000'
+              inactiveTintColor={colorTheme ? 'white' : 'black'}
             />
             <TouchableOpacity onPress={() => onDeleteChat(chat.id)}>
               <Text style={{ color: 'tomato' }}>Delete</Text>
@@ -213,15 +240,20 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
           position: 'absolute',
           bottom: 55,
           right: 15,
-          padding: 6,
-          backgroundColor: 'lightpink',
+          padding: 3,
           borderRadius: 8,
           flexDirection: 'row',
         }}
         onPress={onDeleteAll}
       >
-        <Ionicons name='trash' color={'gray'} size={20} />
-        <Text style={{ color: 'gray' }}>Delete All</Text>
+        <Ionicons name='trash' color={'lightpink'} size={20} />
+        <Text
+          style={{
+            color: 'tomato',
+          }}
+        >
+          Delete All
+        </Text>
       </TouchableOpacity>
 
       {/* FOOTER */}
@@ -234,9 +266,9 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
               style={styles.avatar}
             />
             <Text style={styles.userName}>Hussain Hamim</Text>
-            <Text style={{ color: Colors.greyLight }}>v1.0.0 - 2025</Text>
+            <Text style={{ color: Colors.greyLight }}>v1.0 - 2025</Text>
             <Ionicons
-              name='ellipsis-horizontal'
+              name='settings-outline'
               size={24}
               color={Colors.greyLight}
             />
