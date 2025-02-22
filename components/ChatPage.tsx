@@ -90,13 +90,13 @@ const ChatPage = () => {
 
           // save messages to db
           // TODO: may i bring this to a useEffect
-          if (!loading) {
-            console.log('chatid new: ', chatRef.current);
-            addMessage(db, parseInt(chatRef.current), {
-              content: messages[messages.length - 1].content,
-              role: Role.Bot,
-            });
-          }
+          // if (!loading) {
+          //   console.log('chatid new: ', chatRef.current);
+          //   addMessage(db, parseInt(chatRef.current), {
+          //     content: messages[messages.length - 1].content,
+          //     role: Role.Bot,
+          //   });
+          // }
         }
       } catch (error) {
         console.error('Error streaming message:', error);
@@ -113,6 +113,16 @@ const ChatPage = () => {
     },
     [messages, loading]
   );
+
+  useEffect(() => {
+    if (!loading) {
+      addMessage(db, parseInt(chatRef.current), {
+        content: messages[messages.length - 1]?.content,
+        // content: 'hello', // this above optional []?.content is a bug which should be considered
+        role: Role.Bot,
+      });
+    }
+  }, [loading]);
 
   const onLayout = (event: any) => {
     const { height } = event.nativeEvent.layout;

@@ -25,7 +25,12 @@ import {
   useDrawerStatus,
 } from '@react-navigation/drawer';
 import { Chat } from '@/utils/Interfaces';
-import { deleteChat, getChats, renameChat } from '@/utils/Database';
+import {
+  deleteChat,
+  deleteChatAll,
+  getChats,
+  renameChat,
+} from '@/utils/Database';
 import { useSQLiteContext } from 'expo-sqlite';
 import * as ContextMenu from 'zeego/context-menu';
 
@@ -42,7 +47,7 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
     }
 
     Keyboard.dismiss();
-  }, [history, isDrawerOpen]);
+  }, [isDrawerOpen]);
 
   const loadChats = async () => {
     const result = await getChats(db);
@@ -65,6 +70,28 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
         },
       },
     ]);
+  };
+
+  const onDeleteAll = () => {
+    Alert.alert(
+      'Delete All Chat',
+      'Are you sure you want to delete ALL chats?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete All',
+          onPress: async () => {
+            // Delete the chat all
+            await deleteChatAll(db);
+            // await db.runAsync('DELETE FROM chats WHERE id = ?', chatId);
+            loadChats();
+          },
+        },
+      ]
+    );
   };
 
   const onRenameChat = (chatId: number) => {
@@ -155,7 +182,7 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
           //       >
           //         <ContextMenu.ItemTitle>Delete</ContextMenu.ItemTitle>
           //         <ContextMenu.ItemIcon
-          //           ios={{ name: 'pencil', pointSize: 18 }}
+          //           ios={{ name: 'trash', pointSize: 18 }}
           //           androidIconName='pencil'
           //         />
           //       </ContextMenu.Item>
@@ -166,10 +193,10 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
 
           <React.Fragment key={chat.id}>
             <DrawerItem
-              key={chat.id}
+              // key={chat.id}
               label={chat.title}
-              inactiveTintColor='#000'
               onPress={() => router.push(`/(auth)/(drawer)/(chat)/${chat.id}`)}
+              inactiveTintColor='#000'
             />
             <TouchableOpacity onPress={() => onDeleteChat(chat.id)}>
               <Text style={{ color: 'tomato' }}>Delete</Text>
@@ -181,9 +208,24 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
           </React.Fragment>
         ))}
       </DrawerContentScrollView>
+      <TouchableOpacity
+        style={{
+          position: 'absolute',
+          bottom: 55,
+          right: 15,
+          padding: 6,
+          backgroundColor: 'lightpink',
+          borderRadius: 8,
+          flexDirection: 'row',
+        }}
+        onPress={onDeleteAll}
+      >
+        <Ionicons name='trash' color={'gray'} size={20} />
+        <Text style={{ color: 'gray' }}>Delete All</Text>
+      </TouchableOpacity>
 
       {/* FOOTER */}
-      <View style={{ padding: 16, paddingBottom: bottom + 10 }}>
+      <View style={{ padding: 16, paddingBottom: bottom + 15 }}>
         <Link href='/(auth)/(modal)/settings' asChild>
           <TouchableOpacity style={styles.footer}>
             <Image

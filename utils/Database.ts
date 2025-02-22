@@ -28,7 +28,7 @@ CREATE TABLE chats (
 CREATE TABLE messages (
   id INTEGER PRIMARY KEY NOT NULL, 
   chat_id INTEGER NOT NULL, 
-  content TEXT NOT NULL, 
+  content TEXT, 
   imageUrl TEXT, 
   role TEXT, 
   prompt TEXT, 
@@ -87,6 +87,10 @@ export const addMessage = async (
 
 export const deleteChat = async (db: SQLiteDatabase, chatId: number) => {
   return await db.runAsync('DELETE FROM chats WHERE id = ?', chatId);
+};
+
+export const deleteChatAll = async (db: SQLiteDatabase) => {
+  return await db.runAsync('DELETE FROM chats');
 };
 
 export const renameChat = async (
