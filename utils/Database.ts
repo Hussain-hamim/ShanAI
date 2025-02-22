@@ -1,4 +1,4 @@
-import { Message, Role } from '@/utils/Interfaces';
+import { Chat, Message, Role } from '@/utils/Interfaces';
 import { SQLiteDatabase } from 'expo-sqlite';
 import * as FileSystem from 'expo-file-system';
 
@@ -52,7 +52,7 @@ export const addChat = async (db: SQLiteDatabase, title: string) => {
 };
 
 export const getChats = async (db: SQLiteDatabase) => {
-  return await db.getAllAsync('SELECT * FROM chats');
+  return await db.getAllAsync<Chat>('SELECT * FROM chats');
 };
 
 export const getMessages = async (

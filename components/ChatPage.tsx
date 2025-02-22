@@ -140,8 +140,9 @@ const ChatPage = () => {
           keyboardDismissMode='on-drag'
           onContentSizeChange={() => {
             if (messages.length > 0) {
-              // if (loading) {
-              // flatListRef.current?.scrollToEnd({ animated: true });
+              if (loading) {
+                flatListRef.current?.scrollToEnd({ animated: true });
+              }
             }
           }}
           contentContainerStyle={{

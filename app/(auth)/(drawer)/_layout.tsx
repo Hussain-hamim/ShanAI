@@ -7,23 +7,79 @@ import {
   Dimensions,
   useWindowDimensions,
   TextInput,
+  Keyboard,
+  Alert,
 } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Drawer } from 'expo-router/drawer';
 import Colors from '@/constants/Colors';
-import { Link, useNavigation } from 'expo-router';
+import { Link, router, useNavigation } from 'expo-router';
 import { FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { DrawerActions, NavigationContainer } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
+  DrawerItem,
   DrawerItemList,
+  useDrawerStatus,
 } from '@react-navigation/drawer';
+import { Chat } from '@/utils/Interfaces';
+import { deleteChat, getChats, renameChat } from '@/utils/Database';
+import { useSQLiteContext } from 'expo-sqlite';
+import * as ContextMenu from 'zeego/context-menu';
 
 // a customized drawer component
 export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
   const { top, bottom } = useSafeAreaInsets();
+  const isDrawerOpen = useDrawerStatus() === 'open';
+  const [history, sethistory] = useState<Chat[]>([]);
+  const db = useSQLiteContext();
+
+  useEffect(() => {
+    if (isDrawerOpen) {
+      loadChats();
+    }
+
+    Keyboard.dismiss();
+  }, [history, isDrawerOpen]);
+
+  const loadChats = async () => {
+    const result = await getChats(db);
+    console.log('my chat', result);
+    sethistory(result);
+  };
+
+  const onDeleteChat = (chatId: number) => {
+    Alert.alert('Delete Chat', 'Are you sure you want to delete this chat?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Delete',
+        onPress: async () => {
+          // Delete the chat
+          await db.runAsync('DELETE FROM chats WHERE id = ?', chatId);
+          loadChats();
+        },
+      },
+    ]);
+  };
+
+  const onRenameChat = (chatId: number) => {
+    Alert.prompt(
+      'Rename Chat',
+      'Enter a new name for the chat',
+      async (newName) => {
+        if (newName) {
+          // Rename the chat
+          await renameChat(db, chatId, newName);
+          loadChats();
+        }
+      }
+    );
+  };
 
   return (
     <View style={{ flex: 1, marginTop: top + 16 }}>
@@ -51,7 +107,61 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
       >
         {/* we spread the items from the existing drawer component vis props */}
         <DrawerItemList {...props} />
-        <View style={{ gap: 10 }}>{}</View>
+        {history.map((chat) => (
+          ////////////////////
+          // <ContextMenu.Root>
+          //   <ContextMenu.Trigger>
+          //     <DrawerItem
+          //       key={chat.id}
+          //       label={chat.title}
+          //       inactiveTintColor='#000'
+          //       onPress={() =>
+          //         router.push(`/(auth)/(drawer)/(chat)/${chat.id}`)
+          //       }
+          //     />
+          //     <ContextMenu.Content>
+          //       <ContextMenu.Item
+          //         onSelect={() => onRenameChat(chat.id)}
+          //         key='rename'
+          //       >
+          //         <ContextMenu.ItemTitle>Rename</ContextMenu.ItemTitle>
+          //         <ContextMenu.ItemIcon
+          //           ios={{ name: 'pencil', pointSize: 18 }}
+          //           androidIconName='pencil'
+          //         />
+          //       </ContextMenu.Item>
+
+          //       <ContextMenu.Item
+          //         onSelect={() => onDeleteChat(chat.id)}
+          //         key='delete'
+          //       >
+          //         <ContextMenu.ItemTitle>Delete</ContextMenu.ItemTitle>
+          //         <ContextMenu.ItemIcon
+          //           ios={{ name: 'pencil', pointSize: 18 }}
+          //           androidIconName='pencil'
+          //         />
+          //       </ContextMenu.Item>
+          //     </ContextMenu.Content>
+          //   </ContextMenu.Trigger>
+          // </ContextMenu.Root>
+          ////////////////////
+
+          <React.Fragment key={chat.id}>
+            <DrawerItem
+              key={chat.id}
+              label={chat.title}
+              inactiveTintColor='#000'
+              onPress={() => router.push(`/(auth)/(drawer)/(chat)/${chat.id}`)}
+            />
+            <TouchableOpacity onPress={() => onDeleteChat(chat.id)}>
+              <Text style={{ color: 'tomato' }}>Delete</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => onRenameChat(chat.id)}>
+              <Text style={{ color: 'green' }}>Rename</Text>
+            </TouchableOpacity>
+          </React.Fragment>
+        ))}
       </DrawerContentScrollView>
 
       {/* FOOTER */}
@@ -132,6 +242,27 @@ const Layout = () => {
           ),
         }}
       />
+
+      <Drawer.Screen
+        name='(chat)/[id]'
+        options={{
+          title: 'Chat',
+          drawerItemStyle: { display: 'none' },
+          headerRight: () => (
+            <Link href={'/(auth)/(drawer)/(chat)/new'} push asChild>
+              <TouchableOpacity>
+                <Ionicons
+                  name='create-outline'
+                  size={26}
+                  color={Colors.grey}
+                  style={{ marginRight: 16 }}
+                />
+              </TouchableOpacity>
+            </Link>
+          ),
+        }}
+      />
+
       <Drawer.Screen
         name='dalle'
         options={{

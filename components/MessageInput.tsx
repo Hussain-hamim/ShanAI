@@ -5,7 +5,7 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from '@expo/vector-icons';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Keyboard } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import Animated, {
   Extrapolation,
@@ -49,6 +49,7 @@ const MessageInput = ({ onShouldSendMessage, loading }: MessageInputProps) => {
     // todo
     onShouldSendMessage(message);
     setMessage('');
+    Keyboard.dismiss();
   };
 
   const onChangeText = (text: string) => {
