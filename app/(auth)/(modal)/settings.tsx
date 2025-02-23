@@ -1,7 +1,9 @@
+import { AUTH_STORAGE_KEY, tokenCache } from '@/app/_layout';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
 import { Storage } from '@/utils/Storage';
-import { useAuth } from '@clerk/clerk-expo';
+import { useAuth, useUser } from '@clerk/clerk-expo';
+import { Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import React from 'react';
 import { useState } from 'react';
@@ -12,6 +14,7 @@ import {
   StyleSheet,
   TextInput,
   Button,
+  Image,
 } from 'react-native';
 import { useMMKVString } from 'react-native-mmkv';
 
@@ -27,6 +30,7 @@ const Page = () => {
   const router = useRouter();
 
   const { signOut } = useAuth();
+  const { user } = useUser();
 
   const saveApiKey = async () => {
     setKey(apiKey);
@@ -41,59 +45,68 @@ const Page = () => {
 
   return (
     <View style={styles.container}>
-      {key && key !== '' && (
-        <>
-          <Text style={styles.label}>You are all set!</Text>
-          <TouchableOpacity
-            style={[defaultStyles.btn, { backgroundColor: Colors.primary }]}
-            onPress={removeApiKey}
-          >
-            <Text style={styles.buttonText}>Remove API Key</Text>
-          </TouchableOpacity>
-        </>
-      )}
+      <View
+        style={{
+          flex: 0.5,
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 20,
+        }}
+      >
+        <Image
+          style={{
+            width: 100,
+            height: 100,
+            borderRadius: 50,
+            borderWidth: 5,
+            borderColor: '#438851da',
+          }}
+          source={require('@/assets/images/anime-pfp.jpg')}
+        />
+        <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+          <Text style={{}}>User Email: </Text>
 
-      {(!key || key === '') && (
-        <>
-          <Text style={styles.label}>API Key & Organization:</Text>
-          <TextInput
-            style={styles.input}
-            value={apiKey}
-            onChangeText={setApiKey}
-            placeholder='Enter your API key'
-            autoCorrect={false}
-            autoCapitalize='none'
-            multiline
-            hitSlop={200}
-          />
-          <TextInput
-            style={styles.input}
-            value={org}
-            onChangeText={setOrg}
-            placeholder='Your organization'
-            autoCorrect={false}
-            autoCapitalize='none'
-            hitSlop={200}
-          />
+          {user?.primaryEmailAddress?.emailAddress}
+        </Text>
+      </View>
 
-          <TouchableOpacity
-            style={[defaultStyles.btn, { backgroundColor: Colors.primary }]}
-            onPress={saveApiKey}
-          >
-            <Text style={styles.buttonText}>Save API Key</Text>
-          </TouchableOpacity>
+      <Text style={{}}>API Key:</Text>
+      <TextInput
+        style={styles.input}
+        value={apiKey}
+        onChangeText={setApiKey}
+        placeholder='Enter your API key'
+        autoCorrect={false}
+        autoCapitalize='none'
+        multiline
+        hitSlop={200}
+      />
 
-          <TouchableOpacity
-            style={[defaultStyles.btn, { backgroundColor: Colors.orange }]}
-            onPress={async () => {
-              await signOut();
-              router.replace('/');
-            }}
-          >
-            <Text style={styles.buttonText}>Sign Out</Text>
-          </TouchableOpacity>
-        </>
-      )}
+      <TouchableOpacity
+        style={[defaultStyles.btn, { backgroundColor: Colors.primary }]}
+        onPress={saveApiKey}
+      >
+        <Text style={styles.buttonText}>Save API Key</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[defaultStyles.btn, { backgroundColor: Colors.primary }]}
+        onPress={() => {}}
+      >
+        <Text style={styles.buttonText}>About</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[defaultStyles.btn, { backgroundColor: Colors.orange }]}
+        onPress={async () => {
+          await signOut();
+          router.replace('/');
+          await tokenCache.removeToken(AUTH_STORAGE_KEY);
+        }}
+        hitSlop={50}
+      >
+        <Ionicons name='log-out-outline' size={28} color={'white'} />
+        <Text style={styles.buttonText}>Sign Out</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -122,6 +135,7 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     fontSize: 16,
+    marginHorizontal: 10,
   },
 });
 export default Page;

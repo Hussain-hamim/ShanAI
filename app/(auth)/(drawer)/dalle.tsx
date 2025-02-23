@@ -1,12 +1,13 @@
 import ChatMessageDalle from '@/components/ChatMessageDalle';
-// import HeaderDropDown from '@/components/HeaderDropDown';
+import HeaderDropDown from '@/components/HeaderDropDown';
 import MessageInput from '@/components/MessageInput';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
+import { generateImage } from '@/utils/api';
 import { Message, Role } from '@/utils/Interfaces';
 import { Storage } from '@/utils/Storage';
 import { FlashList } from '@shopify/flash-list';
-import { Redirect, Stack } from 'expo-router';
+import { Redirect, Stack, useNavigation } from 'expo-router';
 import React from 'react';
 import { useMemo, useState } from 'react';
 import {
@@ -19,6 +20,7 @@ import {
 } from 'react-native';
 // import { useMMKVString } from 'react-native-mmkv';
 import OpenAI from 'react-native-openai';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const dummyMessages = [
   {
@@ -36,8 +38,7 @@ const Page = () => {
   // const [key, setKey] = useMMKVString('apikey', Storage);
   // const [organization, setOrganization] = useMMKVString('org', Storage);
 
-  const [messages, setMessages] = useState<Message[]>(dummyMessages);
-  const [working, setWorking] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   // if (!key || key === '' || !organization || organization === '') {
   //   return <Redirect href={'/(auth)/(modal)/settings'} />;
@@ -51,6 +52,36 @@ const Page = () => {
   //     }),
   //   []
   // );
+
+  const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
+  // const [prompt, setPrompt] = useState('');
+  const [isWorking, setWorking] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleGenerate = async (prompt: string) => {
+    if (!prompt.trim() || isWorking) return;
+
+    setWorking(true);
+    setError(null);
+    try {
+      setMessages([...messages, { role: Role.User, content: prompt }]);
+
+      const imageUrl = await generateImage(prompt);
+
+      setMessages((prev) => [
+        ...prev,
+        { role: Role.Bot, content: '', imageUrl, prompt: prompt },
+      ]);
+
+      setGeneratedImage(imageUrl);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate image');
+    } finally {
+      setWorking(false);
+    }
+  };
 
   const onLayout = (event: any) => {
     const { height } = event.nativeEvent.layout;
@@ -125,7 +156,7 @@ const Page = () => {
           keyboardDismissMode='on-drag'
           ListFooterComponent={
             <>
-              {working && (
+              {isWorking && (
                 <ChatMessageDalle
                   {...{ role: Role.Bot, content: '', loading: true }}
                 />
@@ -145,7 +176,10 @@ const Page = () => {
           width: '100%',
         }}
       >
-        <MessageInput loading={working} onShouldSendMessage={getCompletion} />
+        <MessageInput
+          loading={isWorking}
+          onShouldSendMessage={handleGenerate}
+        />
       </KeyboardAvoidingView>
     </View>
   );

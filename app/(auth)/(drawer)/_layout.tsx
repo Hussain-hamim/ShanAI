@@ -34,6 +34,7 @@ import {
 import { useSQLiteContext } from 'expo-sqlite';
 import * as ContextMenu from 'zeego/context-menu';
 import { StatusBar } from 'expo-status-bar';
+import { useUser } from '@clerk/clerk-expo';
 
 // a customized drawer component
 export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
@@ -43,6 +44,7 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
   const db = useSQLiteContext();
   const router = useRouter();
   const [colorTheme, setcolorTheme] = useState(false);
+  const { user } = useUser();
 
   useEffect(() => {
     if (isDrawerOpen) {
@@ -174,23 +176,22 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
           //       }
           //     />
           //     <ContextMenu.Content>
-
-          //           <ContextMenu.Preview>
-          //             {()=>(
-          //               <View
-          //               style={{
-          //                 alignItems: 'center',
-          //                 justifyContent: 'center',
-          //                 padding: 16,
-          //                 height: 200,
-          //                 width: 250,
-          //                 backgroundColor: '#fff'
-          //               }}
-          //               >
-          // <Text>{chat.title}</Text>
-          //               </View>
-          //             )}
-          //           </ContextMenu.Preview>
+          //       <ContextMenu.Preview>
+          //         {() => (
+          //           <View
+          //             style={{
+          //               alignItems: 'center',
+          //               justifyContent: 'center',
+          //               padding: 16,
+          //               height: 200,
+          //               width: 250,
+          //               backgroundColor: '#fff',
+          //             }}
+          //           >
+          //             <Text>{chat.title}</Text>
+          //           </View>
+          //         )}
+          //       </ContextMenu.Preview>
 
           //       <ContextMenu.Item
           //         onSelect={() => onRenameChat(chat.id)}
@@ -216,7 +217,7 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
           //     </ContextMenu.Content>
           //   </ContextMenu.Trigger>
           // </ContextMenu.Root>
-          ////////////////////
+          //////////////////
 
           <React.Fragment key={chat.id}>
             <DrawerItem
@@ -265,7 +266,9 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
               source={require('@/assets/images/anime-pfp.jpg')}
               style={styles.avatar}
             />
-            <Text style={styles.userName}>Hussain Hamim</Text>
+            <Text style={styles.userName}>
+              {user?.primaryEmailAddress?.emailAddress}
+            </Text>
             <Text style={{ color: Colors.greyLight }}>v1.0 - 2025</Text>
             <Ionicons
               name='settings-outline'
@@ -358,7 +361,22 @@ const Layout = () => {
       <Drawer.Screen
         name='dalle'
         options={{
-          title: 'Dall-E',
+          title: 'Image Generation',
+          drawerIcon: () => (
+            <View style={[styles.item, { backgroundColor: '#000' }]}>
+              <Image
+                style={[styles.dallEImage]}
+                source={require('@/assets/images/dalle.png')}
+              />
+            </View>
+          ),
+        }}
+      />
+
+      <Drawer.Screen
+        name='deepseek'
+        options={{
+          title: 'deepseek',
           drawerIcon: () => (
             <View style={[styles.item, { backgroundColor: '#000' }]}>
               <Image
