@@ -1,33 +1,23 @@
 import Colors from '@/constants/Colors';
-import {
-  FontAwesome6,
-  Ionicons,
-  MaterialCommunityIcons,
-  MaterialIcons,
-} from '@expo/vector-icons';
-import { View, StyleSheet, ActivityIndicator, Keyboard } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
+import { useState } from 'react';
+import { ActivityIndicator, Keyboard, StyleSheet, View } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import Animated, {
   Extrapolation,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
-  withTiming,
+  withSpring,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FontAwesome5 } from '@expo/vector-icons';
-import { useRef, useState } from 'react';
-import { BlurView } from 'expo-blur';
-import * as DocumentPicker from 'expo-document-picker';
-import * as ImagePicker from 'expo-image-picker';
-
-import { Text } from 'react-native';
-import React from 'react';
 
 const ATouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 export type MessageInputProps = {
-  // TODO:
   onShouldSendMessage: (message: string) => void;
   loading: boolean;
 };
@@ -37,132 +27,131 @@ const MessageInput = ({ onShouldSendMessage, loading }: MessageInputProps) => {
   const { bottom } = useSafeAreaInsets();
   const expanded = useSharedValue(0);
 
-  const expandItems = () => {
-    expanded.value = withTiming(1, { duration: 400 });
-  };
-
-  const collapseItems = () => {
-    expanded.value = withTiming(0, { duration: 400 });
+  const toggleMediaButtons = () => {
+    expanded.value = withSpring(expanded.value === 0 ? 1 : 0);
   };
 
   const onSend = () => {
-    // todo
-    onShouldSendMessage(message);
-    setMessage('');
-    Keyboard.dismiss();
+    if (message.trim().length > 0) {
+      onShouldSendMessage(message);
+      setMessage('');
+      Keyboard.dismiss();
+    }
   };
 
   const onChangeText = (text: string) => {
-    collapseItems();
     setMessage(text);
+    // Hide media buttons when typing starts
+    if (text.length > 0 && expanded.value === 1) {
+      expanded.value = withSpring(0);
+    }
   };
 
-  const expandedButtonStyle = useAnimatedStyle(() => {
-    const opacityInterpolation = interpolate(
-      expanded.value,
-      [0, 1],
-      [1, 0],
-      Extrapolation.CLAMP
-    );
-
-    const widthInterpolation = interpolate(
-      expanded.value,
-      [0, 1],
-      [30, 0],
-      Extrapolation.CLAMP
-    );
-
-    return {
-      opacity: opacityInterpolation,
-      width: widthInterpolation,
-    };
-  });
-
   const buttonViewStyle = useAnimatedStyle(() => {
-    const widthInterpolation = interpolate(
+    const width = interpolate(
       expanded.value,
       [0, 1],
-      [0, 100],
+      [0, 120],
+      Extrapolation.CLAMP
+    );
+    const marginRight = interpolate(
+      expanded.value,
+      [0, 1],
+      [0, 8],
       Extrapolation.CLAMP
     );
 
     return {
+      width,
+      marginRight,
       opacity: expanded.value,
-      width: widthInterpolation,
     };
   });
 
   return (
     <BlurView
-      intensity={120}
-      tint='extraLight'
-      style={{
-        paddingBottom: bottom + 20,
-        paddingTop: 10,
-        borderTopRightRadius: 30,
-        borderTopLeftRadius: 30,
-        backgroundColor: Colors.grey,
-        borderTopColor: 'gray',
-        borderTopWidth: 0.7,
-      }}
+      intensity={90}
+      tint='light'
+      style={[
+        styles.container,
+        {
+          paddingBottom: bottom + 16,
+          paddingTop: 12,
+        },
+      ]}
     >
       <View style={styles.row}>
-        <ATouchableOpacity
-          onPress={expandItems}
-          style={[styles.roundBtn, expandedButtonStyle]}
+        <TouchableOpacity
+          onPress={toggleMediaButtons}
+          style={styles.expandButton}
+          activeOpacity={0.7}
         >
-          <Ionicons name='add' size={30} color={Colors.grey} />
-        </ATouchableOpacity>
+          <Ionicons
+            name='add'
+            size={24}
+            color={Colors.primary}
+            style={{
+              transform: [
+                {
+                  rotate: expanded.value === 1 ? '45deg' : '0deg',
+                },
+              ],
+            }}
+          />
+        </TouchableOpacity>
 
-        <Animated.View style={[styles.buttonView, buttonViewStyle]}>
-          <TouchableOpacity onPress={() => ImagePicker.launchCameraAsync()}>
-            <Ionicons name='camera-outline' size={24} color={Colors.grey} />
+        <Animated.View style={[styles.mediaButtons, buttonViewStyle]}>
+          <TouchableOpacity
+            style={styles.mediaButton}
+            onPress={() => ImagePicker.launchCameraAsync()}
+          >
+            <Ionicons name='camera' size={20} color={Colors.primary} />
           </TouchableOpacity>
           <TouchableOpacity
+            style={styles.mediaButton}
             onPress={() => ImagePicker.launchImageLibraryAsync()}
           >
-            <Ionicons name='image-outline' size={24} color={Colors.grey} />
+            <Ionicons name='image' size={20} color={Colors.primary} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => DocumentPicker.getDocumentAsync()}>
-            <Ionicons name='folder-outline' size={24} color={Colors.grey} />
+          <TouchableOpacity
+            style={styles.mediaButton}
+            onPress={() => DocumentPicker.getDocumentAsync()}
+          >
+            <Ionicons name='document' size={20} color={Colors.primary} />
           </TouchableOpacity>
         </Animated.View>
 
-        <TextInput
-          autoFocus
-          placeholder='Message'
-          style={styles.messageInput}
-          multiline
-          value={message}
-          onChangeText={onChangeText}
-          onFocus={collapseItems}
-          returnKeyType='done'
-        />
+        <View style={styles.inputContainer}>
+          <TextInput
+            placeholder='Type a message...'
+            placeholderTextColor='#999'
+            style={styles.messageInput}
+            multiline
+            value={message}
+            onChangeText={onChangeText}
+            returnKeyType='send'
+            onSubmitEditing={onSend}
+            blurOnSubmit={false}
+          />
+        </View>
 
-        {message.length > 0 ? (
-          <TouchableOpacity onPress={onSend}>
-            <Ionicons
-              name='arrow-up-circle-outline'
-              size={35}
-              color={Colors.grey}
-            />
-          </TouchableOpacity>
-        ) : (
-          <>
-            {loading ? (
-              <ActivityIndicator size='large' color='gray' />
-            ) : (
-              <TouchableOpacity>
-                <MaterialCommunityIcons
-                  name='microphone'
-                  size={30}
-                  color={'white'}
-                  style={{ backgroundColor: 'green', borderRadius: 15 }}
-                />
-              </TouchableOpacity>
-            )}
-          </>
-        )}
+        <View style={styles.sendButtonContainer}>
+          {message.length > 0 ? (
+            <TouchableOpacity onPress={onSend} style={styles.sendButton}>
+              <Ionicons name='send' size={20} color='white' />
+            </TouchableOpacity>
+          ) : loading ? (
+            <ActivityIndicator size='small' color={Colors.primary} />
+          ) : (
+            <TouchableOpacity style={styles.micButton}>
+              <MaterialCommunityIcons
+                name='microphone'
+                size={20}
+                color='white'
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     </BlurView>
   );
@@ -170,152 +159,77 @@ const MessageInput = ({ onShouldSendMessage, loading }: MessageInputProps) => {
 
 export default MessageInput;
 
-// const ATouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
-
-// export type Props = {
-//   onShouldSend: (message: string) => void;
-// };
-
-// const MessageInput = ({ onShouldSend }: Props) => {
-//   const [message, setMessage] = useState('');
-//   const { bottom } = useSafeAreaInsets();
-//   const expanded = useSharedValue(0);
-//   const inputRef = useRef<TextInput>(null);
-
-//   const expandItems = () => {
-//     expanded.value = withTiming(1, { duration: 400 });
-//   };
-
-//   const collapseItems = () => {
-//     expanded.value = withTiming(0, { duration: 400 });
-//   };
-
-//   const expandButtonStyle = useAnimatedStyle(() => {
-//     const opacityInterpolation = interpolate(
-//       expanded.value,
-//       [0, 1],
-//       [1, 0],
-//       Extrapolation.CLAMP
-//     );
-//     const widthInterpolation = interpolate(
-//       expanded.value,
-//       [0, 1],
-//       [30, 0],
-//       Extrapolation.CLAMP
-//     );
-
-//     return {
-//       opacity: opacityInterpolation,
-//       width: widthInterpolation,
-//     };
-//   });
-
-//   const buttonViewStyle = useAnimatedStyle(() => {
-//     const widthInterpolation = interpolate(
-//       expanded.value,
-//       [0, 1],
-//       [0, 100],
-//       Extrapolation.CLAMP
-//     );
-//     return {
-//       width: widthInterpolation,
-//       opacity: expanded.value,
-//     };
-//   });
-
-//   const onChangeText = (text: string) => {
-//     collapseItems();
-//     setMessage(text);
-//   };
-
-//   const onSend = () => {
-//     onShouldSend(message);
-//     setMessage('');
-//   };
-
-//   const onSelectCard = (text: string) => {
-//     onShouldSend(text);
-//   };
-
-//   return (
-//     <BlurView
-//       intensity={90}
-//       tint='extraLight'
-//       style={{ paddingBottom: bottom, paddingTop: 10 }}
-//     >
-//       <View style={styles.row}>
-//         <ATouchableOpacity
-//           onPress={expandItems}
-//           style={[styles.roundBtn, expandButtonStyle]}
-//         >
-//           <Ionicons name='add' size={24} color={Colors.grey} />
-//         </ATouchableOpacity>
-
-//         <Animated.View style={[styles.buttonView, buttonViewStyle]}>
-//           <TouchableOpacity onPress={() => ImagePicker.launchCameraAsync()}>
-//             <Ionicons name='camera-outline' size={24} color={Colors.grey} />
-//           </TouchableOpacity>
-//           <TouchableOpacity
-//             onPress={() => ImagePicker.launchImageLibraryAsync()}
-//           >
-//             <Ionicons name='image-outline' size={24} color={Colors.grey} />
-//           </TouchableOpacity>
-//           <TouchableOpacity onPress={() => DocumentPicker.getDocumentAsync()}>
-//             <Ionicons name='folder-outline' size={24} color={Colors.grey} />
-//           </TouchableOpacity>
-//         </Animated.View>
-
-//         <TextInput
-//           autoFocus
-//           ref={inputRef}
-//           placeholder='Message'
-//           style={styles.messageInput}
-//           onFocus={collapseItems}
-//           onChangeText={onChangeText}
-//           value={message}
-//           multiline
-//         />
-//         {message.length > 0 ? (
-//           <TouchableOpacity onPress={onSend}>
-//             <Ionicons name='arrow-up-circle' size={24} color={Colors.grey} />
-//           </TouchableOpacity>
-//         ) : (
-//           <TouchableOpacity>
-//             <FontAwesome5 name='headphones' size={24} color={Colors.grey} />
-//           </TouchableOpacity>
-//         )}
-//       </View>
-//     </BlurView>
-//   );
-// };
-
 const styles = StyleSheet.create({
+  container: {
+    borderTopRightRadius: 24,
+    borderTopLeftRadius: 24,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+    overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.9)',
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
+    minHeight: 56,
+  },
+  inputContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(118, 118, 128, 0.12)',
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    minHeight: 36,
+    justifyContent: 'center',
+    marginHorizontal: 8,
   },
   messageInput: {
-    flex: 1,
-    marginHorizontal: 10,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 20,
-    padding: 10,
-    borderColor: Colors.greyLight,
-    backgroundColor: Colors.light,
+    fontSize: 16,
+    color: Colors.dark,
+    paddingVertical: 8,
   },
-  roundBtn: {
-    width: 30,
-    height: 30,
-    borderRadius: 20,
-    backgroundColor: Colors.input,
+  expandButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(118, 118, 128, 0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  buttonView: {
+  mediaButtons: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    height: 36,
+    overflow: 'hidden',
+  },
+  mediaButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(118, 118, 128, 0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  sendButtonContainer: {
+    width: 36,
+    height: 36,
+    marginLeft: 8,
+  },
+  sendButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  micButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#00A884',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
-// export default MessageInput;
