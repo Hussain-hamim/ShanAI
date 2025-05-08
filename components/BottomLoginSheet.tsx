@@ -9,20 +9,6 @@ const BottomLoginSheet = () => {
 
   return (
     <View style={[styles.container, { paddingBottom: bottom + 40 }]}>
-      <TouchableOpacity style={[defaultStyles.btn, styles.btnLight]}>
-        <Ionicons name='logo-apple' size={18} style={styles.btnIcon} />
-        <Text style={styles.btnLightText}>Continue with Apple</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={[defaultStyles.btn, styles.btnDark]}>
-        <Ionicons
-          name='logo-google'
-          size={20}
-          style={styles.btnIcon}
-          color={'tomato'}
-        />
-        <Text style={styles.btnDarkText}>Continue with Google</Text>
-      </TouchableOpacity>
       <Link
         href={{
           pathname: '/login',
@@ -38,7 +24,7 @@ const BottomLoginSheet = () => {
             style={styles.btnIcon}
             color={'#fff'}
           />
-          <Text style={styles.btnDarkText}>Sign up with email</Text>
+          <Text style={styles.btnDarkText}>Sign up</Text>
         </TouchableOpacity>
       </Link>
       <Link
@@ -54,7 +40,7 @@ const BottomLoginSheet = () => {
             name='log-in-outline'
             size={26}
             style={styles.btnIcon}
-            color={'green'}
+            color={'white'}
           />
           <Text style={styles.btnDarkText}>Log in</Text>
         </TouchableOpacity>
@@ -74,7 +60,7 @@ const BottomLoginSheet = () => {
             style={styles.btnIcon}
             color={'purple'}
           />
-          <Text style={styles.btnDarkText}>Log in as Guest</Text>
+          <Text style={styles.btnDarkText}>Guest Mode</Text>
         </TouchableOpacity>
       </Link>
     </View>

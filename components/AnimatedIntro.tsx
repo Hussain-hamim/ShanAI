@@ -1,239 +1,113 @@
-import Colors from '@/constants/Colors';
-import { memo } from 'react';
-import { StyleSheet, Text, useWindowDimensions } from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, useWindowDimensions } from 'react-native';
 import Animated, {
-  interpolate,
+  Easing,
   interpolateColor,
-  useAnimatedReaction,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue,
-  withDelay,
+  withRepeat,
+  withSequence,
   withTiming,
+  useDerivedValue,
 } from 'react-native-reanimated';
 import { ReText } from 'react-native-redash';
+import Colors from '@/constants/Colors';
 
 const content = [
+  { title: "Hello, I'm ShanAI.", bg: Colors.green, fontColor: Colors.pink },
+  { title: 'Let’s connect minds.', bg: Colors.lime, fontColor: Colors.brown },
   {
-    title: "Let's create.",
-    bg: Colors.lime,
-    fontColor: Colors.pink,
-  },
-  {
-    title: "Let's brainstorm.",
-    bg: Colors.brown,
-    fontColor: Colors.sky,
-  },
-  {
-    title: "Let's discover.",
-    bg: Colors.orange,
-    fontColor: Colors.blue,
-  },
-  {
-    title: "Let's go.",
+    title: 'Smarter every message.',
     bg: Colors.teal,
     fontColor: Colors.yellow,
   },
-  {
-    title: 'ShanAI.',
-    bg: Colors.green,
-    fontColor: Colors.pink,
-  },
+  { title: 'Your AI, reimagined.', bg: Colors.blue, fontColor: Colors.orange },
 ];
 
 const AnimatedIntro = () => {
-  const { width } = useWindowDimensions();
-  const ballWidth = 34;
-  const half = width / 2 - ballWidth / 2;
+  const { width, height } = useWindowDimensions();
 
-  const currentX = useSharedValue(half);
+  const ringScale = useSharedValue(1);
   const currentIndex = useSharedValue(0);
-  const isAtStart = useSharedValue(true);
-  const labelWidth = useSharedValue(0);
-  const canGoToNext = useSharedValue(false);
-  const didPlay = useSharedValue(false);
 
-  const newColorIndex = useDerivedValue(() => {
-    if (!isAtStart.value) {
-      return (currentIndex.value + 1) % content.length;
-    }
-    return currentIndex.value;
-  }, [currentIndex]);
-
-  const textStyle = useAnimatedStyle(() => {
-    return {
-      color: interpolateColor(
-        currentX.value,
-        [half, half + labelWidth.value / 2],
-        [
-          content[newColorIndex.value].fontColor,
-          content[currentIndex.value].fontColor,
-        ],
-        'RGB'
+  useEffect(() => {
+    // Pulse ring animation
+    ringScale.value = withRepeat(
+      withSequence(
+        withTiming(1.3, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) })
       ),
-      transform: [
-        {
-          translateX: interpolate(
-            currentX.value,
-            [half, half + labelWidth.value / 2],
-            [half + 4, half - labelWidth.value / 2]
-          ),
-        },
-      ],
-    };
-  }, [currentIndex, currentX]);
+      -1
+    );
 
-  const ballStyle = useAnimatedStyle(() => {
-    return {
-      backgroundColor: interpolateColor(
-        currentX.value,
-        [half, half + labelWidth.value / 2],
-        [
-          content[newColorIndex.value].fontColor,
-          content[currentIndex.value].fontColor,
-        ],
-        'RGB'
-      ),
-      transform: [{ translateX: currentX.value }],
-    };
-  });
+    // Cycle text and colors
+    const interval = setInterval(() => {
+      currentIndex.value = (currentIndex.value + 1) % content.length;
+    }, 3500);
 
-  const mask = useAnimatedStyle(
-    () => ({
-      backgroundColor: interpolateColor(
-        currentX.value,
-        [half, half + labelWidth.value / 2],
-        [content[newColorIndex.value].bg, content[currentIndex.value].bg],
-        'RGB'
-      ),
-      transform: [{ translateX: currentX.value }],
-      width: width / 1.5,
-      borderTopLeftRadius: 20,
-      borderBottomLeftRadius: 20,
-    }),
-    [currentIndex, currentX, labelWidth]
+    return () => clearInterval(interval);
+  }, []);
+
+  const bgColor = useDerivedValue(() =>
+    interpolateColor(
+      currentIndex.value,
+      content.map((_, i) => i),
+      content.map((c) => c.bg)
+    )
   );
 
-  const style1 = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      currentX.value,
-      [half, half + labelWidth.value / 2],
-      [content[newColorIndex.value].bg, content[currentIndex.value].bg],
-      'RGB'
-    ),
-    opacity: interpolate(1, [1, 0], [1, 0, 0, 0, 0, 0, 0]),
-    transform: [
-      {
-        translateX: interpolate(
-          1,
-          [1, 0],
-          [0, -width * 2, -width, -width, -width, -width, -width]
-        ),
-      },
-    ],
+  const textColor = useDerivedValue(() =>
+    interpolateColor(
+      currentIndex.value,
+      content.map((_, i) => i),
+      content.map((c) => c.fontColor)
+    )
+  );
+
+  const animatedText = useDerivedValue(() => content[currentIndex.value].title);
+
+  const containerStyle = useAnimatedStyle(() => ({
+    backgroundColor: bgColor.value,
   }));
 
-  const text = useDerivedValue(() => {
-    const index = currentIndex.value;
-    return content[index].title;
-  }, [currentIndex]);
+  const ringStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: ringScale.value }],
+    opacity: ringScale.value === 1 ? 0.4 : 0.15,
+    borderColor: textColor.value,
+  }));
 
-  useAnimatedReaction(
-    () => labelWidth.value,
-    (newWidth) => {
-      currentX.value = withDelay(
-        1000,
-        withTiming(
-          half + newWidth / 2,
-          {
-            duration: 800,
-          },
-          (finished) => {
-            if (finished) {
-              canGoToNext.value = true;
-              isAtStart.value = false;
-            }
-          }
-        )
-      );
-    },
-    [labelWidth, currentX, half]
-  );
-
-  useAnimatedReaction(
-    () => canGoToNext.value,
-    (next) => {
-      if (next) {
-        canGoToNext.value = false;
-        currentX.value = withDelay(
-          1000,
-          withTiming(
-            half,
-            {
-              duration: 800,
-            },
-            (finished) => {
-              if (finished) {
-                currentIndex.value = (currentIndex.value + 1) % content.length;
-                isAtStart.value = true;
-                didPlay.value = false;
-              }
-            }
-          )
-        );
-      }
-    },
-    [currentX, labelWidth]
-  );
+  const textStyle = useAnimatedStyle(() => ({
+    color: textColor.value,
+  }));
 
   return (
-    <Animated.View style={[styles.wrapper, style1]}>
-      <Animated.View style={[styles.content]}>
-        <Animated.View style={[styles.ball, ballStyle, { marginTop: 315 }]} />
-        <Animated.View style={[styles.mask, mask, { marginTop: 310 }]} />
-        <ReText
-          onLayout={(e) => {
-            labelWidth.value = e.nativeEvent.layout.width + 4;
-          }}
-          style={[styles.title, textStyle, { marginTop: 300 }]}
-          text={text}
-        />
-      </Animated.View>
+    <Animated.View style={[styles.container, containerStyle]}>
+      <Animated.View style={[styles.ring, ringStyle]} />
+      <ReText text={animatedText} style={[styles.text, textStyle]} />
     </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: -1, // keep it behind your login sheet
   },
-  mask: {
-    zIndex: 1,
+  ring: {
     position: 'absolute',
-    left: '0%',
-    // height: 44,
-    height: 58,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    borderWidth: 3,
   },
-  ball: {
-    width: 40,
-    zIndex: 10,
-    height: 40,
-    backgroundColor: '#000',
-    borderRadius: 20,
-    position: 'absolute',
-    left: '0%',
-  },
-  titleText: {
-    flexDirection: 'row',
-  },
-  title: {
-    fontSize: 36,
+  text: {
+    fontSize: 26,
     fontWeight: '600',
-    left: '0%',
-    position: 'absolute',
-  },
-  content: {
-    // marginTop: 300,
+    textAlign: 'center',
+    marginHorizontal: 20,
   },
 });
-export default memo(AnimatedIntro);
+
+export default AnimatedIntro;

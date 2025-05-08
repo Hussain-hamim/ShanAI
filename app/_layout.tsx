@@ -207,6 +207,8 @@ const InitialLayout = () => {
         options={{
           presentation: 'modal',
           title: '',
+          headerShadowVisible: false,
+          headerStyle: { backgroundColor: '#f8f9fa' },
         }}
       />
       <Stack.Screen name='(auth)' options={{ headerShown: false }} />
