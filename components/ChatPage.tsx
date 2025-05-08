@@ -138,7 +138,7 @@ const ChatPage = () => {
         {messages.length === 0 && (
           <View style={[styles.logoContainer, { marginTop: height / 2 - 100 }]}>
             <Image
-              source={require('@/assets/images/logo-white.png')}
+              source={require('@/assets/images/shanai.png')}
               style={styles.image}
             />
           </View>

@@ -141,7 +141,7 @@ const MessageInput = ({ onShouldSendMessage, loading }: MessageInputProps) => {
               <Ionicons name='send' size={20} color='white' />
             </TouchableOpacity>
           ) : loading ? (
-            <ActivityIndicator size='small' color={Colors.primary} />
+            <ActivityIndicator size='large' color={Colors.primary} />
           ) : (
             <TouchableOpacity style={styles.micButton}>
               <MaterialCommunityIcons

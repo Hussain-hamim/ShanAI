@@ -1,9 +1,18 @@
 import Colors from '@/constants/Colors';
-import { Text, ScrollView, TouchableOpacity, StyleSheet, View } from 'react-native';
+import {
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  View,
+} from 'react-native';
 
 const PredefinedMessages = [
   { title: 'Explain React Native', text: "like I'm five years old" },
-  { title: 'Suggest fun activites', text: 'for a family visting San Francisco' },
+  {
+    title: 'Suggest fun activites',
+    text: 'for a family visting San Francisco',
+  },
   { title: 'Recommend a dish', text: "to impress a date who's a picky eater" },
 ];
 
@@ -21,14 +30,21 @@ const MessageIdeas = ({ onSelectCard }: Props) => {
           paddingHorizontal: 20,
           paddingVertical: 10,
           gap: 16,
-        }}>
+        }}
+      >
         {PredefinedMessages.map((item, index) => (
           <TouchableOpacity
             key={index}
+            activeOpacity={0.3}
             style={styles.card}
-            onPress={() => onSelectCard(`${item.title} ${item.text}`)}>
-            <Text style={{ fontSize: 16, fontWeight: '500' }}>{item.title}</Text>
-            <Text style={{ color: Colors.grey, fontSize: 14 }}>{item.text}</Text>
+            onPress={() => onSelectCard(`${item.title} ${item.text}`)}
+          >
+            <Text style={{ fontSize: 16, fontWeight: '500' }}>
+              {item.title}
+            </Text>
+            <Text style={{ color: Colors.grey, fontSize: 14 }}>
+              {item.text}
+            </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
