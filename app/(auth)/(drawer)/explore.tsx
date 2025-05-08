@@ -104,6 +104,7 @@ const explore = () => {
     <View style={styles.container}>
       <Drawer.Screen
         options={{
+          title: 'Explore',
           headerLeft: () => (
             <TouchableOpacity
               onPress={() => router.back()}

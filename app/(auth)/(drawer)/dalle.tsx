@@ -1,25 +1,21 @@
 import ChatMessageDalle from '@/components/ChatMessageDalle';
-import HeaderDropDown from '@/components/HeaderDropDown';
 import MessageInput from '@/components/MessageInput';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
 import { generateImage } from '@/utils/api';
 import { Message, Role } from '@/utils/Interfaces';
-import { Storage } from '@/utils/Storage';
+import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
-import { Redirect, Stack, useNavigation } from 'expo-router';
-import React from 'react';
-import { useMemo, useState } from 'react';
+import { Stack, useNavigation } from 'expo-router';
+import React, { useState } from 'react';
 import {
-  Image,
-  View,
-  StyleSheet,
-  Text,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 // import { useMMKVString } from 'react-native-mmkv';
-import OpenAI from 'react-native-openai';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const dummyMessages = [
@@ -77,6 +73,7 @@ const Page = () => {
 
       setGeneratedImage(imageUrl);
     } catch (err) {
+      console.log('error generating image: ', err);
       setError(err instanceof Error ? err.message : 'Failed to generate image');
     } finally {
       setWorking(false);
@@ -138,10 +135,7 @@ const Page = () => {
             ]}
           >
             <View style={styles.logoContainer}>
-              <Image
-                source={require('@/assets/images/dalle.png')}
-                style={styles.image}
-              />
+              <Ionicons name='image' size={48} color={'orchid'} />
             </View>
             <Text style={styles.label}>
               Let me turn your imagination into imagery.

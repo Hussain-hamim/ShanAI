@@ -220,23 +220,19 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
           //////////////////
 
           <React.Fragment key={chat.id}>
+            <Text style={{ color: Colors.greyLight }}>
+              Previous Chats history:
+            </Text>
             <DrawerItem
               // key={chat.id}
               label={chat.title}
               onPress={() => router.push(`/(auth)/(drawer)/(chat)/${chat.id}`)}
-              inactiveTintColor={colorTheme ? 'white' : 'black'}
+              inactiveTintColor={colorTheme ? 'white' : Colors.grey}
             />
-            <TouchableOpacity onPress={() => onDeleteChat(chat.id)}>
-              <Text style={{ color: 'tomato' }}>Delete</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => onRenameChat(chat.id)}>
-              <Text style={{ color: 'green' }}>Rename</Text>
-            </TouchableOpacity>
           </React.Fragment>
         ))}
       </DrawerContentScrollView>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={{
           position: 'absolute',
           bottom: 55,
@@ -255,10 +251,24 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
         >
           Delete All
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       {/* FOOTER */}
       <View style={{ padding: 16, paddingBottom: bottom + 15 }}>
+        <Link href='/(auth)/(modal)/settings' asChild>
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row',
+              gap: 12,
+              alignItems: 'center',
+              paddingVertical: 15,
+            }}
+          >
+            <Ionicons name='settings-outline' size={24} color={Colors.gray} />
+            <Text style={{ fontSize: 17 }}>Settings</Text>
+          </TouchableOpacity>
+        </Link>
+
         <Link href='/(auth)/(modal)/settings' asChild>
           <TouchableOpacity style={styles.footer}>
             <Image
@@ -267,14 +277,9 @@ export const CustomDrawerContent = (props: DrawerContentComponentProps) => {
               style={styles.avatar}
             />
             <Text style={styles.userName}>
-              {user?.primaryEmailAddress?.emailAddress}
+              {user?.primaryEmailAddress?.emailAddress ||
+                'hussain-hamim@gmail.com'}
             </Text>
-            <Text style={{ color: Colors.greyLight }}>v1.0 - 2025</Text>
-            <Ionicons
-              name='settings-outline'
-              size={24}
-              color={Colors.greyLight}
-            />
           </TouchableOpacity>
         </Link>
       </View>
@@ -363,12 +368,21 @@ const Layout = () => {
         options={{
           title: 'Image Generation',
           drawerIcon: () => (
-            <View style={[styles.item, { backgroundColor: '#000' }]}>
-              <Image
-                style={[styles.dallEImage]}
-                source={require('@/assets/images/dalle.png')}
-              />
+            <View style={[styles.item, {}]}>
+              <Ionicons name='image' size={26} color='green' />
             </View>
+          ),
+          headerRight: () => (
+            <Link href={'/(auth)/(drawer)/dalle'} push asChild>
+              <TouchableOpacity>
+                <Ionicons
+                  name='create-outline'
+                  size={26}
+                  color={Colors.grey}
+                  style={{ marginRight: 16 }}
+                />
+              </TouchableOpacity>
+            </Link>
           ),
         }}
       />
@@ -376,13 +390,14 @@ const Layout = () => {
       <Drawer.Screen
         name='deepseek'
         options={{
-          title: 'deepseek',
+          title: 'DeepSeek AI',
           drawerIcon: () => (
-            <View style={[styles.item, { backgroundColor: '#000' }]}>
-              <Image
+            <View style={[styles.item, {}]}>
+              {/* <Image
                 style={[styles.dallEImage]}
                 source={require('@/assets/images/dalle.png')}
-              />
+              /> */}
+              <Ionicons name='fish-outline' size={26} color='blue' />
             </View>
           ),
         }}
@@ -391,7 +406,7 @@ const Layout = () => {
       <Drawer.Screen
         name='explore'
         options={{
-          title: 'Explore GPTs',
+          title: 'Explore Features',
           drawerIcon: () => (
             <View style={[styles.exploreItem]}>
               <Ionicons name='apps-outline' size={18} color='#000' />
@@ -435,12 +450,12 @@ const styles = StyleSheet.create({
     height: 30,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
+    width: 35,
+    height: 35,
+    borderRadius: 17,
   },
   userName: {
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: '500',
     flex: 1,
   },

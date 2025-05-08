@@ -15,6 +15,7 @@ import {
   TextInput,
   Button,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { useMMKVString } from 'react-native-mmkv';
 
@@ -24,6 +25,13 @@ const Page = () => {
 
   const [key, setKey] = useState('');
   const [organization, setOrganization] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  if (loading) {
+    <View style={[defaultStyles.loadingOverlay, { flex: 1 }]}>
+      <ActivityIndicator size='large' color='#fff' />
+    </View>;
+  }
 
   const [apiKey, setApiKey] = useState('');
   const [org, setOrg] = useState('');
@@ -66,7 +74,7 @@ const Page = () => {
         <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
           <Text style={{}}>User Email: </Text>
 
-          {user?.primaryEmailAddress?.emailAddress}
+          {user?.primaryEmailAddress?.emailAddress || 'hussain-hamim@gmail.com'}
         </Text>
       </View>
 
@@ -79,7 +87,7 @@ const Page = () => {
         autoCorrect={false}
         autoCapitalize='none'
         multiline
-        hitSlop={200}
+        hitSlop={10}
       />
 
       <TouchableOpacity
@@ -92,6 +100,7 @@ const Page = () => {
         style={[defaultStyles.btn, { backgroundColor: Colors.primary }]}
         onPress={() => {}}
       >
+        <Ionicons name='information-circle-outline' size={28} color={'white'} />
         <Text style={styles.buttonText}>About</Text>
       </TouchableOpacity>
 
@@ -101,8 +110,9 @@ const Page = () => {
           await signOut();
           router.replace('/');
           await tokenCache.removeToken(AUTH_STORAGE_KEY);
+          setLoading(true);
         }}
-        hitSlop={50}
+        hitSlop={40}
       >
         <Ionicons name='log-out-outline' size={28} color={'white'} />
         <Text style={styles.buttonText}>Sign Out</Text>
