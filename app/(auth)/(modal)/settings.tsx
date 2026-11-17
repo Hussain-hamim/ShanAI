@@ -1,38 +1,23 @@
-import { AUTH_STORAGE_KEY, tokenCache } from '@/app/_layout';
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
+import { disableGuestMode } from '@/utils/guest';
 import { Storage } from '@/utils/Storage';
-import { useAuth, useUser } from '@clerk/clerk-expo';
+import { useAuth, useUser } from '@clerk/expo';
 import { Ionicons } from '@expo/vector-icons';
-import { Link, useRouter } from 'expo-router';
-import React from 'react';
-import { useState } from 'react';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  TextInput,
-  Button,
-  Image,
   ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { useMMKVString } from 'react-native-mmkv';
 
 const Page = () => {
-  // const [key, setKey] = useMMKVString('apikey', Storage);
-  // const [organization, setOrganization] = useMMKVString('org', Storage);
-
-  const [key, setKey] = useState('');
-  const [organization, setOrganization] = useState('');
   const [loading, setLoading] = useState(false);
-
-  if (loading) {
-    <View style={[defaultStyles.loadingOverlay, { flex: 1 }]}>
-      <ActivityIndicator size='large' color='#fff' />
-    </View>;
-  }
-
   const [apiKey, setApiKey] = useState('');
   const [org, setOrg] = useState('');
   const router = useRouter();
@@ -40,16 +25,28 @@ const Page = () => {
   const { signOut } = useAuth();
   const { user } = useUser();
 
+  useEffect(() => {
+    Storage.getString('apikey').then((value) => {
+      if (value) setApiKey(value);
+    });
+    Storage.getString('org').then((value) => {
+      if (value) setOrg(value);
+    });
+  }, []);
+
   const saveApiKey = async () => {
-    setKey(apiKey);
-    setOrganization(org);
+    await Storage.set('apikey', apiKey);
+    await Storage.set('org', org);
     router.push('/(auth)/(drawer)/(chat)/new');
   };
 
-  const removeApiKey = async () => {
-    setKey('');
-    setOrganization('');
-  };
+  if (loading) {
+    return (
+      <View style={[defaultStyles.loadingOverlay, { flex: 1 }]}>
+        <ActivityIndicator size='large' color='#fff' />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -72,13 +69,12 @@ const Page = () => {
           source={require('@/assets/images/anime-pfp.jpg')}
         />
         <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-          <Text style={{}}>User Email: </Text>
-
+          <Text>User Email: </Text>
           {user?.primaryEmailAddress?.emailAddress || 'hussain-hamim@gmail.com'}
         </Text>
       </View>
 
-      <Text style={{}}>API Key:</Text>
+      <Text>API Key:</Text>
       <TextInput
         style={styles.input}
         value={apiKey}
@@ -107,10 +103,14 @@ const Page = () => {
       <TouchableOpacity
         style={[defaultStyles.btn, { backgroundColor: Colors.orange }]}
         onPress={async () => {
-          await signOut();
-          router.replace('/');
-          await tokenCache.removeToken(AUTH_STORAGE_KEY);
           setLoading(true);
+          await disableGuestMode();
+          try {
+            await signOut();
+          } catch {
+            // Guest users have no Clerk session
+          }
+          router.replace('/');
         }}
         hitSlop={40}
       >
@@ -120,16 +120,13 @@ const Page = () => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
     paddingVertical: 20,
     gap: 5,
-  },
-  label: {
-    fontSize: 18,
-    marginBottom: 10,
   },
   input: {
     borderWidth: 1,
@@ -140,7 +137,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     backgroundColor: '#fff',
   },
-
   buttonText: {
     color: 'white',
     textAlign: 'center',
@@ -148,4 +144,5 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
 });
+
 export default Page;

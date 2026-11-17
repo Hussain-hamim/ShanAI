@@ -1,11 +1,7 @@
 import { Chat, Message, Role } from '@/utils/Interfaces';
 import { SQLiteDatabase } from 'expo-sqlite';
-import * as FileSystem from 'expo-file-system';
 
 export async function migrateDbIfNeeded(db: SQLiteDatabase) {
-  // Log DB path for debugging
-  console.log(FileSystem.documentDirectory);
-
   const DATABASE_VERSION = 1;
   let result = await db.getFirstAsync<{ user_version: number }>(
     'PRAGMA user_version'
@@ -35,8 +31,6 @@ CREATE TABLE messages (
   FOREIGN KEY (chat_id) REFERENCES chats (id) ON DELETE CASCADE
 );
 `);
-
-    console.log(result);
 
     currentDbVersion = 1;
   }

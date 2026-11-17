@@ -1,40 +1,42 @@
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
-import { useSignIn, useSignUp } from '@clerk/clerk-expo';
+import { useSignIn, useSignUp } from '@clerk/expo';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Animated,
+  Easing,
   Image,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Animated,
-  Easing,
 } from 'react-native';
-import { AUTH_STORAGE_KEY, tokenCache } from './_layout';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import { disableGuestMode } from '@/utils/guest';
 
 const Login = () => {
   const { type } = useLocalSearchParams<{ type: string }>();
+  const isLogin = type === 'login';
   const [loading, setLoading] = useState(false);
   const [emailAddress, setEmailAddress] = useState('');
   const [password, setPassword] = useState('');
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
-  const scaleValue = new Animated.Value(1);
+  const scaleValue = useRef(new Animated.Value(1)).current;
 
-  const { signIn, isLoaded, setActive } = useSignIn();
+  const { signIn, errors: signInErrors, fetchStatus: signInStatus } = useSignIn();
   const {
     signUp,
-    isLoaded: signUpLoaded,
-    setActive: signUpSetActive,
+    errors: signUpErrors,
+    fetchStatus: signUpStatus,
   } = useSignUp();
 
   const animatePress = () => {
@@ -55,40 +57,74 @@ const Login = () => {
   };
 
   const handleSignIn = async () => {
-    if (!isLoaded) return;
     setLoading(true);
     try {
-      const result = await signIn.create({
-        identifier: emailAddress,
+      const { error } = await signIn.password({
+        emailAddress,
         password,
       });
-      const token = result.createdSessionId || '';
-      await tokenCache.saveToken(AUTH_STORAGE_KEY, token);
-      setActive({ session: token });
-      router.replace('/(auth)/(drawer)/(chat)/new');
+
+      if (error) {
+        Alert.alert(error.message || 'Login failed');
+        return;
+      }
+
+      if (signIn.status === 'complete') {
+        await disableGuestMode();
+        await signIn.finalize({
+          navigate: () => {
+            router.replace('/(auth)/(drawer)/(chat)/new');
+          },
+        });
+      } else {
+        Alert.alert(
+          'Additional steps required',
+          `Sign-in status: ${signIn.status}`
+        );
+      }
     } catch (error: any) {
-      Alert.alert(error.errors?.[0]?.message || 'Login failed');
+      Alert.alert(error?.message || 'Login failed');
+    } finally {
       setLoading(false);
     }
   };
 
   const handleSignUp = async () => {
-    if (!signUpLoaded) return;
     setLoading(true);
     try {
-      const result = await signUp.create({
+      const { error } = await signUp.password({
         emailAddress,
         password,
       });
-      const token = result.createdSessionId || '';
-      await tokenCache.saveToken(AUTH_STORAGE_KEY, token);
-      signUpSetActive({ session: token });
-      router.replace('/(auth)/(drawer)/(chat)/new');
+
+      if (error) {
+        Alert.alert(error.message || 'Signup failed');
+        return;
+      }
+
+      if (signUp.status === 'complete') {
+        await disableGuestMode();
+        await signUp.finalize({
+          navigate: () => {
+            router.replace('/(auth)/(drawer)/(chat)/new');
+          },
+        });
+      } else {
+        // Email verification may be required depending on Clerk settings
+        Alert.alert(
+          'Check your email',
+          'Additional verification may be required before you can sign in.'
+        );
+      }
     } catch (error: any) {
-      Alert.alert(error.errors?.[0]?.message || 'Signup failed');
+      Alert.alert(error?.message || 'Signup failed');
+    } finally {
       setLoading(false);
     }
   };
+
+  const busy =
+    loading || signInStatus === 'fetching' || signUpStatus === 'fetching';
 
   return (
     <LinearGradient colors={['#f8f9fa', '#e9ecef']} style={styles.container}>
@@ -96,10 +132,14 @@ const Login = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingView}
       >
-        <View style={styles.inner}>
+        <ScrollView
+          contentContainerStyle={styles.inner}
+          keyboardShouldPersistTaps='handled'
+          showsVerticalScrollIndicator={false}
+        >
           <StatusBar style='dark' />
 
-          {loading && (
+          {busy && (
             <View style={[defaultStyles.loadingOverlay, styles.loadingOverlay]}>
               <ActivityIndicator size='large' color={Colors.primary} />
             </View>
@@ -114,10 +154,10 @@ const Login = () => {
 
           <View style={styles.header}>
             <Text style={styles.title}>
-              {type === 'login' ? 'Welcome back' : 'Create account'}
+              {isLogin ? 'Welcome back' : 'Create account'}
             </Text>
             <Text style={styles.subtitle}>
-              {type === 'login'
+              {isLogin
                 ? 'Sign in to continue your journey'
                 : 'Join us to get started'}
             </Text>
@@ -176,7 +216,15 @@ const Login = () => {
               />
             </View>
 
-            {type === 'login' && (
+            {(signInErrors?.fields?.password ||
+              signUpErrors?.fields?.password) && (
+              <Text style={styles.errorText}>
+                {signInErrors?.fields?.password?.message ||
+                  signUpErrors?.fields?.password?.message}
+              </Text>
+            )}
+
+            {isLogin && (
               <TouchableOpacity style={styles.forgotPassword}>
                 <Text style={styles.forgotPasswordText}>Forgot password?</Text>
               </TouchableOpacity>
@@ -187,7 +235,7 @@ const Login = () => {
             <TouchableOpacity
               hitSlop={40}
               onPressIn={animatePress}
-              onPress={type === 'login' ? handleSignIn : handleSignUp}
+              onPress={isLogin ? handleSignIn : handleSignUp}
               activeOpacity={0.9}
             >
               <Animated.View
@@ -200,7 +248,7 @@ const Login = () => {
                   end={{ x: 1, y: 0 }}
                 >
                   <Text style={styles.buttonText}>
-                    {type === 'login' ? 'Sign In' : 'Create Account'}
+                    {isLogin ? 'Sign In' : 'Create Account'}
                   </Text>
                   <View style={styles.buttonIcon}>
                     <Ionicons name='arrow-forward' size={16} color='white' />
@@ -212,7 +260,7 @@ const Login = () => {
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>
-              {type === 'login'
+              {isLogin
                 ? "Don't have an account?"
                 : 'Already have an account?'}
             </Text>
@@ -220,16 +268,16 @@ const Login = () => {
               hitSlop={40}
               onPress={() =>
                 router.setParams({
-                  type: type === 'login' ? 'signup' : 'login',
+                  type: isLogin ? 'signup' : 'login',
                 })
               }
             >
               <Text style={styles.footerLink}>
-                {type === 'login' ? 'Sign up' : 'Sign in'}
+                {isLogin ? 'Sign up' : 'Sign in'}
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>
   );
@@ -243,9 +291,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   inner: {
-    flex: 1,
+    flexGrow: 1,
     padding: 24,
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    paddingTop: Platform.OS === 'ios' ? 40 : 24,
     justifyContent: 'center',
   },
   loadingOverlay: {
@@ -308,6 +356,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#2d3436',
     paddingVertical: 0,
+  },
+  errorText: {
+    color: '#d63031',
+    marginBottom: 8,
+    fontSize: 13,
   },
   forgotPassword: {
     alignSelf: 'flex-end',

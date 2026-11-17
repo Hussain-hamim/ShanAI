@@ -10,7 +10,6 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { defaultStyles } from '@/constants/Styles';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import HeaderDropDown from '@/components/HeaderDropDown';
 import MessageInput from '@/components/MessageInput';
 import MessageIdeas from '@/components/MessageIdeas';
 import { Message, Role } from '@/utils/Interfaces';
@@ -63,6 +62,8 @@ const ChatPage = () => {
 
   const getCompletion = useCallback(
     async (message: string) => {
+      if (loading || !message.trim()) return;
+
       if (messages.length === 0) {
         const result = await addChat(db, message);
         const chatID = result.lastInsertRowId;
@@ -75,7 +76,6 @@ const ChatPage = () => {
         { content: message, role: Role.User },
         { content: '', role: Role.Bot },
       ]);
-      messages.push();
 
       try {
         setLoading(true);
@@ -86,33 +86,27 @@ const ChatPage = () => {
             updatedMessages[updatedMessages.length - 1].content += chunk;
             return updatedMessages;
           });
-
-          console.log(chunk);
-
-          // save messages to db
-          // TODO: may i bring this to a useEffect
-          // if (!loading) {
-          //   console.log('chatid new: ', chatRef.current);
-          //   addMessage(db, parseInt(chatRef.current), {
-          //     content: messages[messages.length - 1].content,
-          //     role: Role.Bot,
-          //   });
-          // }
         }
       } catch (error) {
         console.error('Error streaming message:', error);
-        setMessages((prev) => [
-          ...prev,
-          {
-            content: 'Error fetching response. Please try again.',
-            role: Role.Bot,
-          },
-        ]);
+        const errorText =
+          error instanceof Error
+            ? error.message
+            : 'Error fetching response. Please try again.';
+        setMessages((prev) => {
+          const updated = [...prev];
+          const last = updated[updated.length - 1];
+          if (last?.role === Role.Bot) {
+            last.content = errorText;
+            return updated;
+          }
+          return [...updated, { content: errorText, role: Role.Bot }];
+        });
       } finally {
         setLoading(false);
       }
     },
-    [messages, loading]
+    [messages, loading, db]
   );
 
   useEffect(() => {

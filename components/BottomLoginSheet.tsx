@@ -1,68 +1,56 @@
 import Colors from '@/constants/Colors';
 import { defaultStyles } from '@/constants/Styles';
+import { enableGuestMode } from '@/utils/guest';
 import { Ionicons } from '@expo/vector-icons';
-import { Link } from 'expo-router';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 const BottomLoginSheet = () => {
   const { bottom } = useSafeAreaInsets();
+  const router = useRouter();
+
+  const enterGuestMode = async () => {
+    await enableGuestMode();
+    // Force a remount-friendly navigation after flag is persisted
+    router.replace('/(auth)/(drawer)/(chat)/new');
+  };
 
   return (
     <View style={[styles.container, { paddingBottom: bottom + 40 }]}>
-      <Link
-        href={{
-          pathname: '/login',
-          params: { type: 'register' },
-        }}
+      <TouchableOpacity
         style={[defaultStyles.btn, styles.btnDark]}
-        asChild
+        onPress={() => router.push({ pathname: '/login', params: { type: 'signup' } })}
       >
-        <TouchableOpacity>
-          <Ionicons
-            name='mail'
-            size={20}
-            style={styles.btnIcon}
-            color={'#fff'}
-          />
-          <Text style={styles.btnDarkText}>Sign up</Text>
-        </TouchableOpacity>
-      </Link>
-      <Link
-        href={{
-          pathname: '/login',
-          params: { type: 'login' },
-        }}
+        <Ionicons name='mail' size={20} style={styles.btnIcon} color={'#fff'} />
+        <Text style={styles.btnDarkText}>Sign up</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
         style={[defaultStyles.btn, styles.btnOutline]}
-        asChild
+        onPress={() => router.push({ pathname: '/login', params: { type: 'login' } })}
       >
-        <TouchableOpacity>
-          <Ionicons
-            name='log-in-outline'
-            size={26}
-            style={styles.btnIcon}
-            color={'white'}
-          />
-          <Text style={styles.btnDarkText}>Log in</Text>
-        </TouchableOpacity>
-      </Link>
-      <Link
-        href={{
-          pathname: '/(auth)/(drawer)/(chat)/new',
-          params: { type: 'guest' },
-        }}
+        <Ionicons
+          name='log-in-outline'
+          size={26}
+          style={styles.btnIcon}
+          color={'white'}
+        />
+        <Text style={styles.btnDarkText}>Log in</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
         style={[defaultStyles.btn, styles.btnOutline]}
-        asChild
+        onPress={enterGuestMode}
       >
-        <TouchableOpacity>
-          <Ionicons
-            name='bag-outline'
-            size={20}
-            style={styles.btnIcon}
-            color={'purple'}
-          />
-          <Text style={styles.btnDarkText}>Guest Mode</Text>
-        </TouchableOpacity>
-      </Link>
+        <Ionicons
+          name='bag-outline'
+          size={20}
+          style={styles.btnIcon}
+          color={'purple'}
+        />
+        <Text style={styles.btnDarkText}>Guest Mode</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -77,13 +65,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 26,
     gap: 14,
-  },
-  btnLight: {
-    backgroundColor: '#fff',
-  },
-  btnLightText: {
-    color: '#000',
-    fontSize: 20,
   },
   btnDark: {
     backgroundColor: Colors.grey,
@@ -100,4 +81,5 @@ const styles = StyleSheet.create({
     paddingRight: 6,
   },
 });
+
 export default BottomLoginSheet;

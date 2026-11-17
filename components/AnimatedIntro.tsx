@@ -1,21 +1,22 @@
+import Colors from '@/constants/Colors';
 import React, { useEffect } from 'react';
-import { StyleSheet, useWindowDimensions } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, {
   Easing,
+  interpolate,
   interpolateColor,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
   withRepeat,
   withSequence,
   withTiming,
-  useDerivedValue,
 } from 'react-native-reanimated';
 import { ReText } from 'react-native-redash';
-import Colors from '@/constants/Colors';
 
 const content = [
   { title: "Hello, I'm ShanAI.", bg: Colors.green, fontColor: Colors.pink },
-  { title: 'Let’s connect minds.', bg: Colors.lime, fontColor: Colors.brown },
+  { title: "Let's connect minds.", bg: Colors.lime, fontColor: Colors.brown },
   {
     title: 'Smarter every message.',
     bg: Colors.teal,
@@ -26,23 +27,24 @@ const content = [
 
 const AnimatedIntro = () => {
   const { width, height } = useWindowDimensions();
+  // Keep hero content in the space above the bottom login sheet
+  const heroHeight = height * 0.55;
 
   const ringScale = useSharedValue(1);
   const currentIndex = useSharedValue(0);
 
   useEffect(() => {
-    // Pulse ring animation
     ringScale.value = withRepeat(
       withSequence(
-        withTiming(1.3, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1.25, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
         withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) })
       ),
       -1
     );
 
-    // Cycle text and colors
     const interval = setInterval(() => {
-      currentIndex.value = (currentIndex.value + 1) % content.length;
+      const next = (Math.round(currentIndex.value) + 1) % content.length;
+      currentIndex.value = withTiming(next, { duration: 600 });
     }, 3500);
 
     return () => clearInterval(interval);
@@ -64,7 +66,9 @@ const AnimatedIntro = () => {
     )
   );
 
-  const animatedText = useDerivedValue(() => content[currentIndex.value].title);
+  const animatedText = useDerivedValue(
+    () => content[Math.round(currentIndex.value) % content.length].title
+  );
 
   const containerStyle = useAnimatedStyle(() => ({
     backgroundColor: bgColor.value,
@@ -72,7 +76,7 @@ const AnimatedIntro = () => {
 
   const ringStyle = useAnimatedStyle(() => ({
     transform: [{ scale: ringScale.value }],
-    opacity: ringScale.value === 1 ? 0.4 : 0.15,
+    opacity: interpolate(ringScale.value, [1, 1.25], [0.45, 0.18]),
     borderColor: textColor.value,
   }));
 
@@ -82,8 +86,15 @@ const AnimatedIntro = () => {
 
   return (
     <Animated.View style={[styles.container, containerStyle]}>
-      <Animated.View style={[styles.ring, ringStyle]} />
-      <ReText text={animatedText} style={[styles.text, textStyle]} />
+      <View style={[styles.hero, { height: heroHeight, width }]}>
+        <Animated.View style={[styles.ring, ringStyle]} />
+        <View style={[styles.textWrap, { width: width - 48 }]}>
+          <ReText
+            text={animatedText}
+            style={[styles.text, textStyle, { width: width - 48 }]}
+          />
+        </View>
+      </View>
     </Animated.View>
   );
 };
@@ -91,22 +102,28 @@ const AnimatedIntro = () => {
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
+  },
+  hero: {
     alignItems: 'center',
-    zIndex: -1, // keep it behind your login sheet
+    justifyContent: 'center',
+    overflow: 'hidden',
   },
   ring: {
     position: 'absolute',
-    width: 180,
-    height: 180,
-    borderRadius: 90,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
     borderWidth: 3,
   },
+  textWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+  },
   text: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: '600',
     textAlign: 'center',
-    marginHorizontal: 20,
   },
 });
 

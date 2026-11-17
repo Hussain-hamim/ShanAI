@@ -1,5 +1,15 @@
-import { MMKV } from 'react-native-mmkv';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const Storage = new MMKV({
-  id: 'com.hussain.storage',
-});
+/** Expo Go–safe storage (AsyncStorage). Swap back to MMKV in a dev build later if needed. */
+export const Storage = {
+  async getString(key: string): Promise<string | undefined> {
+    const value = await AsyncStorage.getItem(key);
+    return value ?? undefined;
+  },
+  async set(key: string, value: string): Promise<void> {
+    await AsyncStorage.setItem(key, value);
+  },
+  async delete(key: string): Promise<void> {
+    await AsyncStorage.removeItem(key);
+  },
+};

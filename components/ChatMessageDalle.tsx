@@ -1,9 +1,4 @@
 import Colors from '@/constants/Colors';
-import {
-  copyImageToClipboard,
-  downloadAndSaveImage,
-  shareImage,
-} from '@/utils/Image';
 import { Message, Role } from '@/utils/Interfaces';
 import { Link } from 'expo-router';
 import React from 'react';
@@ -15,36 +10,14 @@ import {
   ActivityIndicator,
   Pressable,
 } from 'react-native';
-import * as ContextMenu from 'zeego/context-menu';
 
-const ChatMessageDalle   = ({
+const ChatMessageDalle = ({
   content,
   role,
   imageUrl,
   prompt,
   loading,
 }: Message & { loading?: boolean }) => {
-  //
-
-  //
-  const contextItems = [
-    {
-      title: 'Copy',
-      systemIcon: 'doc.on.doc',
-      action: () => copyImageToClipboard(imageUrl!),
-    },
-    {
-      title: 'Save to Photos',
-      systemIcon: 'arrow.down.to.line',
-      action: () => downloadAndSaveImage(imageUrl!),
-    },
-    {
-      title: 'Share',
-      systemIcon: 'square.and.arrow.up',
-      action: () => shareImage(imageUrl!),
-    },
-  ];
-
   return (
     <View style={styles.row}>
       {role === Role.Bot ? (
