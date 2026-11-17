@@ -53,23 +53,27 @@ const ChatPage = () => {
 
   useEffect(() => {
     if (id) {
-      console.log('load for search id', id);
-      getMessages(db, parseInt(id)).then((messages) => {
-        setMessages(messages);
-      });
+      setChatId(id);
+      getMessages(db, parseInt(id, 10)).then(setMessages);
     }
-  }, [id]);
+  }, [id, db]);
 
   const getCompletion = useCallback(
     async (message: string) => {
       if (loading || !message.trim()) return;
 
-      if (messages.length === 0) {
+      let activeChatId = Number(chatRef.current);
+
+      if (!activeChatId || Number.isNaN(activeChatId)) {
         const result = await addChat(db, message);
-        const chatID = result.lastInsertRowId;
-        setChatId(chatID.toString());
-        addMessage(db, chatID, { content: message, role: Role.User });
+        activeChatId = Number(result.lastInsertRowId);
+        setChatId(String(activeChatId));
       }
+
+      await addMessage(db, activeChatId, {
+        content: message,
+        role: Role.User,
+      });
 
       setMessages((prev) => [
         ...prev,
@@ -77,19 +81,25 @@ const ChatPage = () => {
         { content: '', role: Role.Bot },
       ]);
 
+      let botContent = '';
+
       try {
         setLoading(true);
 
         for await (const chunk of streamMessage(message)) {
+          botContent += chunk;
           setMessages((prev) => {
             const updatedMessages = [...prev];
-            updatedMessages[updatedMessages.length - 1].content += chunk;
+            updatedMessages[updatedMessages.length - 1] = {
+              ...updatedMessages[updatedMessages.length - 1],
+              content: botContent,
+            };
             return updatedMessages;
           });
         }
       } catch (error) {
         console.error('Error streaming message:', error);
-        const errorText =
+        botContent =
           error instanceof Error
             ? error.message
             : 'Error fetching response. Please try again.';
@@ -97,27 +107,27 @@ const ChatPage = () => {
           const updated = [...prev];
           const last = updated[updated.length - 1];
           if (last?.role === Role.Bot) {
-            last.content = errorText;
+            updated[updated.length - 1] = { ...last, content: botContent };
             return updated;
           }
-          return [...updated, { content: errorText, role: Role.Bot }];
+          return [...updated, { content: botContent, role: Role.Bot }];
         });
       } finally {
+        if (activeChatId && botContent) {
+          try {
+            await addMessage(db, activeChatId, {
+              content: botContent,
+              role: Role.Bot,
+            });
+          } catch (dbError) {
+            console.error('Failed to save bot message:', dbError);
+          }
+        }
         setLoading(false);
       }
     },
-    [messages, loading, db]
+    [loading, db]
   );
-
-  useEffect(() => {
-    if (!loading) {
-      addMessage(db, parseInt(chatRef.current), {
-        content: messages[messages.length - 1]?.content,
-        // content: 'hello', // this above optional []?.content is a bug which should be considered
-        role: Role.Bot,
-      });
-    }
-  }, [loading]);
 
   const onLayout = (event: any) => {
     const { height } = event.nativeEvent.layout;

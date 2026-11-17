@@ -69,6 +69,10 @@ export const addMessage = async (
   chatId: number,
   { content, role, imageUrl, prompt }: Message
 ) => {
+  if (!chatId || Number.isNaN(chatId)) {
+    throw new Error('Cannot save message without a valid chat_id');
+  }
+
   return await db.runAsync(
     'INSERT INTO messages (chat_id, content, role, imageUrl, prompt) VALUES (?, ?, ?, ?, ?)',
     chatId,

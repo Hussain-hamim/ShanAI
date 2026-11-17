@@ -2,16 +2,32 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const genAI = new GoogleGenerativeAI(process.env.EXPO_PUBLIC_GEMINI_API_KEY!);
 
-// gemini-2.0-flash free-tier quota is 0 — use 2.5-flash
-const MODEL_CANDIDATES = ['gemini-2.5-flash', 'gemini-2.0-flash-lite', 'gemini-flash-latest'];
+// Models confirmed working for this API key (2.5-flash is blocked for new users)
+const MODEL_CANDIDATES = [
+  'gemini-flash-lite-latest',
+  'gemini-3.1-flash-lite',
+  'gemini-3-flash-preview',
+];
 
 const STABILITY_API_KEY = process.env.EXPO_PUBLIC_STABILITY_API_KEY ?? '';
 const STABILITY_API_URL =
   'https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image';
 
-function isRateLimited(error: unknown) {
-  const message = error instanceof Error ? error.message : String(error);
-  return message.includes('429') || message.includes('RATE_LIMIT') || message.includes('Quota');
+function errorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function isRetryable(error: unknown) {
+  const message = errorMessage(error);
+  return (
+    message.includes('429') ||
+    message.includes('503') ||
+    message.includes('RATE_LIMIT') ||
+    message.includes('Quota') ||
+    message.includes('high demand') ||
+    message.includes('unavailable') ||
+    message.includes('RESOURCE_EXHAUSTED')
+  );
 }
 
 async function sleep(ms: number) {
@@ -30,45 +46,43 @@ async function generateWithFallback(message: string) {
         return result.response.text();
       } catch (error) {
         lastError = error;
-        if (isRateLimited(error) && attempt < 2) {
-          await sleep(1000 * (attempt + 1));
+        console.warn(
+          `Gemini ${modelName} attempt ${attempt + 1} failed:`,
+          errorMessage(error).slice(0, 160)
+        );
+
+        if (isRetryable(error) && attempt < 2) {
+          await sleep(1500 * (attempt + 1));
           continue;
         }
-        // Try next model on rate limit / not found
         break;
       }
     }
   }
 
-  if (isRateLimited(lastError)) {
+  if (isRetryable(lastError)) {
     throw new Error(
-      'Gemini rate limit hit. Wait a minute and try again, or check your API quota in Google AI Studio.'
+      'Gemini is busy or rate-limited right now. Please wait a few seconds and try again.'
     );
   }
 
-  throw lastError instanceof Error
-    ? lastError
-    : new Error('Failed to get a response from Gemini');
+  throw new Error(
+    lastError instanceof Error
+      ? lastError.message
+      : 'Failed to get a response from Gemini'
+  );
 }
 
 export async function* streamMessage(message: string) {
-  try {
-    if (!process.env.EXPO_PUBLIC_GEMINI_API_KEY) {
-      throw new Error('API key is not configured');
-    }
+  if (!process.env.EXPO_PUBLIC_GEMINI_API_KEY) {
+    throw new Error('API key is not configured');
+  }
 
-    const text = await generateWithFallback(message);
-    const words = text.split(' ');
-    for (const word of words) {
-      yield word + ' ';
-      await sleep(20);
-    }
-  } catch (error) {
-    console.error('Error streaming message:', error);
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    }
-    throw new Error('An unexpected error occurred');
+  const text = await generateWithFallback(message);
+  const words = text.split(' ');
+  for (const word of words) {
+    yield word + ' ';
+    await sleep(20);
   }
 }
 
